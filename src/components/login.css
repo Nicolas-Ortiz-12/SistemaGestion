@@ -1,0 +1,79 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f1eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Contenedor del formulario */
+.login-container {
+    background-color: #1f4a6e;
+    padding: 50px;
+    border-radius: 12px;
+    width: 400px; /* Aumentado */
+    text-align: center;
+    color: white;
+}
+
+/* Título */
+h2 {
+    font-size: 35px; 
+    margin-bottom: 50px;
+}
+
+/* Etiquetas */
+label {
+    display: block;
+    text-align: left;
+    margin: 12px 0 6px;
+    font-size: 18px; /* Aumentado */
+}
+
+/* Contenedor del input con ícono */
+.input-container {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+/* Íconos dentro del input */
+.icon {
+    padding: 0 12px;
+    font-size: 22px; /* Aumentado */
+    color: #888;
+}
+
+/* Estilo de los inputs */
+input {
+    border: none;
+    outline: none;
+    padding: 1px;
+    width: 100%;
+    font-size: 18px; /* Aumentado */
+    color: #333;
+    background: none;
+}
+
+/* Botón de ingresar */
+button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 15px;
+    background-color: #97d4c3;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px; /* Aumentado */
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #80c0ac;
+}
