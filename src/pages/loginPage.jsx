@@ -19,7 +19,7 @@ function LoginPage() {
                     <input type="password" id="password" value="********" readOnly />
                 </div>
 
-                <button type="submit" onClick={handleInicio}>Ingresar</button>
+                <button type="submit">Ingresar</button>
             </form>
         </div>
     );
