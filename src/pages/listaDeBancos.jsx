@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import styles from "../components/listaDeBancos.module.css"; // Importa los estilos como módulo
 
 const ListaDeBancos = () => {
     const [mostrarFormAgregar, setMostrarFormAgregar] = useState(false);
@@ -29,28 +30,31 @@ const ListaDeBancos = () => {
     };
 
     const guardarRegistroBanco = () => {
-        // Aquí puedes completar con lógica para guardar el banco (por ejemplo, enviar a una API)
+        // Lógica para guardar el banco
         setMostrarFormRegistrarBanco(false);
     };
 
     return (
-        <div className="main-content">
-            <div className="header">
-                <h1>Lista de Bancos</h1>
-                <div id="botonesHeader">
-                    <button onClick={handleMostrarAgregar}>
-                        <img src="img/Agregar.png" width="50" />
+        <div className={styles.mainContent}>
+            <div className={styles.header}>
+                <h1 className={styles.headerTitle}>Lista de Bancos</h1>
+                <div className={styles.botonesHeader}>
+                    <button className={styles.botonAgregar} onClick={handleMostrarAgregar}>
+                        <img src="img/Agregar.png" width="50" alt="Agregar banco" />
                     </button>
                 </div>
             </div>
 
-            {/* ... tarjetas y otras partes omitidas para simplificar */}
+            {/* Contenido principal y tarjetas de bancos */}
+            <div className={styles.tarjetas}>
+                {/* Aquí irían tus tarjetas de bancos */}
+            </div>
 
             {mostrarFormAgregar && (
-                <form id="formularioAgregar">
-                    <div id="headerForm1">Agregar Banco</div>
-                    <div className="entradas">
-                        <div className="selector">
+                <form className={styles.formularioAgregar} style={{ display: 'block' }}>
+                    <div className={styles.headerForm}>Agregar Banco</div>
+                    <div className={styles.entradas}>
+                        <div className={styles.selector}>
                             <label>País:</label>
                             <select>
                                 <option>Paraguay</option>
@@ -58,7 +62,7 @@ const ListaDeBancos = () => {
                                 <option>Brasil</option>
                             </select>
                         </div>
-                        <div className="selector">
+                        <div className={styles.selector}>
                             <label>Banco:</label>
                             <select ref={bancoSelectRef} onChange={handleBancoChange}>
                                 <option value="0">Sudameris</option>
@@ -67,40 +71,40 @@ const ListaDeBancos = () => {
                                 <option value="añadirBanco">Añadir banco...</option>
                             </select>
                         </div>
-                        <div className="selector">
+                        <div className={styles.selector}>
                             <label>Tipo de cuenta:</label>
                             <select>
                                 <option>Cuenta Corriente</option>
                                 <option>Caja de ahorro</option>
                             </select>
                         </div>
-                        <div className="escritura">
+                        <div className={styles.escritura}>
                             <label>Número de Cuenta:</label>
                             <input type="text" defaultValue="512031564" />
                         </div>
-                        <div className="botonesForm">
-                            <button type="button">Guardar</button>
-                            <button type="button" onClick={() => setMostrarFormAgregar(false)}>Cerrar</button>
+                        <div className={styles.botonesForm}>
+                            <button type="button" className={styles.guardar}>Guardar</button>
+                            <button type="button" className={styles.cerrar} onClick={() => setMostrarFormAgregar(false)}>Cerrar</button>
                         </div>
                     </div>
                 </form>
             )}
 
             {mostrarFormRegistrarBanco && (
-                <form id="formularioRegistrarBanco" ref={formRegistrarBancoRef}>
-                    <div id="headerForm1">Registrar Nuevo Banco</div>
-                    <div className="entradas">
-                        <div className="escritura">
+                <form className={styles.formularioRegistrarBanco} ref={formRegistrarBancoRef} style={{ display: 'block' }}>
+                    <div className={styles.headerForm}>Registrar Nuevo Banco</div>
+                    <div className={styles.entradas}>
+                        <div className={styles.escritura}>
                             <label>Nombre del Banco:</label>
                             <input type="text" id="NombreBancoRegistrar" />
                         </div>
-                        <div className="escritura">
+                        <div className={styles.escritura}>
                             <label>Dirección:</label>
                             <input type="text" id="DireccionBanco" />
                         </div>
-                        <div className="botonesForm">
-                            <button type="button" onClick={guardarRegistroBanco}>Registrar</button>
-                            <button type="button" onClick={cerrarRegistroBanco}>Volver</button>
+                        <div className={styles.botonesForm}>
+                            <button type="button" className={styles.guardar} onClick={guardarRegistroBanco}>Registrar</button>
+                            <button type="button" className={styles.cerrar} onClick={cerrarRegistroBanco}>Volver</button>
                         </div>
                     </div>
                 </form>
