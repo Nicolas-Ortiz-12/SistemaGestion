@@ -1,0 +1,35 @@
+.card {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #9AD0C2;
+    border-radius: 20px;
+    padding: 1.5rem;
+    width: 320px;
+    min-height: 160px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.info {
+    z-index: 1;
+    max-width: 60%;
+}
+
+.info h2 {
+    margin-bottom: 0.5rem;
+}
+
+.icon {
+    opacity: 0.5;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.icon img {
+    width: 160px;
+    height: auto;
+}

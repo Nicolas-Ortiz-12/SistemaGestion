@@ -1,0 +1,18 @@
+.container {
+    display: flex;
+    
+}
+
+.main {
+    flex: 1;
+    background-color: #f6f1e9;
+    min-height: 100vh;
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    margin-left: 1rem;
+}
