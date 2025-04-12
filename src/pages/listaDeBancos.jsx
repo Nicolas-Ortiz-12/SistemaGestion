@@ -1,5 +1,6 @@
 // src/pages/ListaBancos.jsx
 import React from 'react';
+import { Link } from 'react-router-dom'
 import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 import BankCard from '../components/bankCard';
@@ -20,12 +21,19 @@ export default function ListaDeBancos() {
             <Sidebar paginaImg={imagenBanco} />
             <main className={styles.main}>
                 <Header title="Lista de Bancos">
-                    <button><img src={agregarBanco} width={60}/></button>
-                    <button><img src={editarBanco} width={60}/></button>
+                    <button><img src={agregarBanco} width={60} /></button>
+                    <button><img src={editarBanco} width={60} /></button>
                 </Header>
                 <div className={styles.grid}>
                     {banks.map((b, i) => (
-                        <BankCard key={i} {...b} />
+                        <Link
+                            key={i}
+                            to='/movimientoBancarios'
+                            state={{ bank: b }}
+                            style={{ textDecoration: 'none' }}
+                        >
+                            <BankCard {...b} />
+                        </Link>
                     ))}
                 </div>
             </main>

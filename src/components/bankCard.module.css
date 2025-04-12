@@ -12,13 +12,21 @@
     overflow: hidden;
 }
 
+.card:hover{
+    transform: rotateZ(1deg) rotateY(10deg) scale(1.1);
+    box-shadow: 0 1em 1em #006E8C;
+}
+
 .info {
     z-index: 1;
     max-width: 60%;
+    color: black;
 }
 
 .info h2 {
     margin-bottom: 0.5rem;
+    color: black;
+    font-style: bold;
 }
 
 .icon {

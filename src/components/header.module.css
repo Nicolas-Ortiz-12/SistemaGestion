@@ -4,11 +4,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    text-align: center;
     color: white;
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+.header h1 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    white-space: nowrap;
 }
 
 .header button {
@@ -18,12 +25,7 @@
     cursor: pointer;
 }
 
-.header h1{
-    margin-left: 40%;
-    font-size: 40px;
-}
-
 .actions>* {
-    margin-left: 1rem;
+    margin-left: 2rem;
     cursor: pointer;
 }
