@@ -67,10 +67,12 @@ export default function MovimientosBancarios() {
     // para movimientos
     const startMov = (currentPage - 1) * itemsPerPageMov
     const pageMov = movimientosData.slice(startMov, startMov + itemsPerPageMov)
+    const totalPagesMov = Math.ceil(movimientosData.length / itemsPerPageMov);
 
-    // para conciliaciones (reusar misma paginación o nueva si prefieres)
+    // para conciliaciones
     const startCon = (currentPage - 1) * itemsPerPageCon
     const pageCon = conciliacionesData.slice(startCon, startCon + itemsPerPageCon)
+    const totalPagesCon = Math.ceil(conciliacionesData.length / itemsPerPageCon);
 
     const handleConciliar = () => {
         console.log({
@@ -142,7 +144,7 @@ export default function MovimientosBancarios() {
 
                         <Pagination
                             currentPage={currentPage}
-                            totalPages={totalPages}
+                            totalPages={totalPagesMov}
                             onPageChange={setCurrentPage}
                         />
                     </>
@@ -217,7 +219,7 @@ export default function MovimientosBancarios() {
 
                         <Pagination
                             currentPage={currentPage}
-                            totalPages={totalPages}
+                            totalPages={totalPagesCon}
                             onPageChange={setCurrentPage}
                         />
                     </>

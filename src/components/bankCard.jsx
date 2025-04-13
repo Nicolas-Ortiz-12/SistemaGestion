@@ -1,8 +1,6 @@
-// src/components/BankCard.jsx
 import React from 'react';
-import styles from './BankCard.module.css';
+import styles from './bankCard.module.css';
 import chanchoImg from "../img/Chancho.png"
-import { FaPiggyBank } from 'react-icons/fa';
 
 export default function BankCard({ name, type, account, balance }) {
     return (

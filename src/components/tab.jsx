@@ -81,7 +81,9 @@ const StyledWrapper = styled.div`
     align-items: center;
     justify-content: center;
     border: 0;
+    font-style:bold;
     font-size: 0.85rem;
+    font-
     opacity: 0.6;
     cursor: pointer;
   }

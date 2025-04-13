@@ -17,6 +17,7 @@
 }
 
 .logoImg {
+    width: 130px;
     width: 115px;
     height: auto;
 }
@@ -41,4 +42,13 @@
     margin-top: auto;
     padding: 2rem;
     cursor: pointer;
+}
+
+.link:hover {
+    text-decoration: none;
+}
+
+.link {
+    text-decoration: none;
+    color: white;
 }
