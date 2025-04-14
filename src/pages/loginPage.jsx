@@ -3,8 +3,13 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 const Form = () => {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();   // v6. En v5 usarías useHistory()
 
+    const handleSubmit = e => {
+        e.preventDefault();             // evita recarga
+        // aquí podrías validar usuario/password...
+        navigate('/inicio');         // ruta a la que quieres ir
+    };
     return (
         <StyledWrapper>
             <div id="form-ui">
