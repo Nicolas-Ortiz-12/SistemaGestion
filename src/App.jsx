@@ -15,7 +15,6 @@ function App() {
         <Route path="" element={<Login />} />
         <Route path="inicio" element={<Inicio />} />
 
-        {/* Rutas que comparten el Sidebar */}
         <Route element={<PantallaConSidebar />}>
           <Route path="listaDeBancos" element={<ListaDeBancos />} />
           <Route path="movimientoBancarios" element={<MovimientoBancario />} />

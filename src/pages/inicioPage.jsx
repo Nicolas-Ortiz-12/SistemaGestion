@@ -3,19 +3,23 @@ import inicioImg from "../img/Inicio.png";
 import bancoImg from "../img/Banco.png";
 import proveedorImg from "../img/icono1.png";
 import ordenDePagoImg from "../img/OrdenDePago.png";
-import styles from "../components/inicio.module.css";
+import Usuario from "../components/usuario.jsx";
+import Header from "../components/header.jsx";
+import styles from "./inicio.module.css";
 import { useNavigate } from "react-router-dom";
 
 function InicioPage() {
     const navigate = useNavigate();
 
     return (
-        <div className={styles.mainContent}>
-            <div className={styles.header}>
-                <img src={inicioImg} width="130" alt="Inicio" className={styles.headerImage} />
-                <h1 className={styles.headerTitle}>BIENVENIDO!!</h1>
-            </div>
 
+        <div className={styles.mainContent}>
+            <img src={inicioImg} width="130" className={styles.headerImg} />
+            <Header title="BIENVENIDO!!">
+                <div className={styles.usuarioEnInicio}>
+                    <Usuario />
+                </div>
+            </Header>
             <p className={styles.welcomeText}>
                 Has accedido al <strong>Sistema de Bancos y Tesorería</strong>
             </p>
@@ -36,6 +40,7 @@ function InicioPage() {
                     <h2 className={styles.buttonTitle}>Orden de Pago</h2>
                 </button>
             </div>
+
         </div>
     );
 }

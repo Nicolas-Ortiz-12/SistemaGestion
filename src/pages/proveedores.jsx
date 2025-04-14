@@ -1,10 +1,8 @@
 import React from 'react';
 import { useState } from "react";
-import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 import Pagination from "../components/pagination";
 import agregarProveedorImg from "../img/icono2.png";
-import imagenProveedor from "../img/icono1.png";
 import editarImg from "../img/icono3.png";
 import styles from "./proveedores.module.css";
 

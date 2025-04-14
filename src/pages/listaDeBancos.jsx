@@ -1,7 +1,6 @@
 // src/pages/ListaBancos.jsx
 import React from 'react';
 import { Link } from 'react-router-dom'
-import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 import BankCard from '../components/bankCard';
 import agregarBanco from "../img/Agregar.png";

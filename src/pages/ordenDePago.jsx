@@ -1,9 +1,7 @@
 import React from 'react';
 import { useState } from "react";
-import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 import Pagination from "../components/pagination";
-import imagenOrdenDePago from "../img/OrdenDePago.png";
 import styles from "./ordenDepago.module.css";
 
 const facturas = [
