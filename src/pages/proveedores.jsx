@@ -15,7 +15,7 @@ const proveedores = [
         actividad: "Alimentos y bebidas",
         telefono: "+595985102897",
         email: "contacto@horecadist.com",
-    },
+    }, 
     {
         nombre: "Importadora Martínez",
         ruc: "1548796-3",
@@ -90,7 +90,6 @@ export default function Proveedores() {
     const totalPages = Math.ceil(proveedores.length / itemsPerPage);
     return (
         <div className={styles.container}>
-            <Sidebar paginaImg={imagenProveedor} />
             <main className={styles.main}>
                 <Header title="Proveedores">
                     <button><img src={agregarProveedorImg} width={60} /></button>

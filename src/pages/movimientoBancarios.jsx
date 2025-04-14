@@ -85,8 +85,6 @@ export default function MovimientosBancarios() {
 
     return (
         <div className={styles.container}>
-            <Sidebar paginaImg={movimientosImg} />
-
             <main className={styles.main}>
                 <Header title={`${name} – ${type}`}>
                     <button>

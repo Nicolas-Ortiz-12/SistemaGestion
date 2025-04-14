@@ -10,6 +10,7 @@
     min-height: 160px;
     cursor: pointer;
     overflow: hidden;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 .card:hover{
