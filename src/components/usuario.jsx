@@ -160,6 +160,10 @@ const StyledWrapper = styled.div`
     column-gap: var(--nav-button-distance);
     outline: none;
   }
+  .popup-window ul button svg {
+  transform: scaleX(-1);
+}
+    
 
   .popup-window ul button:hover,
   .popup-window ul button:focus-visible {

@@ -1,13 +1,13 @@
 // src/pages/MovimientosBancarios.jsx
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import Sidebar from '../components/sidebar'
 import Header from '../components/header'
-import movimientosImg from "../img/Movimientos.png"
 import agregarMovimientoImg from "../img/agregarMovimiento.png"
 import TabSelector from '../components/tab.jsx'
 import Pagination from '../components/pagination.jsx';
+import Modal from "../components/modalMovimientos.jsx";
 import styles from '../pages/movimientosBancarios.module.css'
+
 
 const movimientosData = [
     { referencia: 'Pago de Seguro contra Incendios', fecha: '24/03/20', debe: '', haber: '1.500.000', tipo: 'Cheque', estado: 'Emitido' },
@@ -49,7 +49,6 @@ export default function MovimientosBancarios() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPageMov = 8;
     const itemsPerPageCon = 10;
-    const totalPages = 10
 
     // estados para formulario de conciliación
     const [concFecha, setConcFecha] = useState(new Date().toISOString().slice(0, 10))
@@ -82,147 +81,154 @@ export default function MovimientosBancarios() {
             saldoActual: concSaldoAct
         })
     }
+    const [isModalOpen, setModalOpen] = useState(false);
+
 
     return (
         <div className={styles.container}>
             <main className={styles.main}>
                 <Header title={`${name} – ${type}`}>
-                    <button>
-                        <img src={agregarMovimientoImg} width={70} />
-                    </button>
-                </Header>
+                    <button onClick={() => setModalOpen(true)}>
+                    <Modal
+                        isOpen={isModalOpen}
+                        onClose={() => setModalOpen(false)}
+                    />
+                    <img src={agregarMovimientoImg} width={70} />
+                </button>
+            </Header>
 
-                {/* pestañas */}
-                <div className={styles.tabs}>
-                    <TabSelector activeTab={activeTab} onChange={setActiveTab} />
-                </div>
+            {/* pestañas */}
+            <div className={styles.tabs}>
+                <TabSelector activeTab={activeTab} onChange={setActiveTab} />
+            </div>
 
-                {activeTab === 'movimientos' && (
-                    <>
-                        <div className={styles.balanceCard}>
-                            <div className={styles.balanceTitle}>
-                                SALDO TOTAL<br />DE LA CUENTA
-                            </div>
-                            <div className={styles.balanceAmount}>
-                                {balance.replace(/\./g, ',')}₲
-                            </div>
+
+            {activeTab === 'movimientos' && (
+                <>
+                    <div className={styles.balanceCard}>
+                        <div className={styles.balanceTitle}>
+                            SALDO TOTAL<br />DE LA CUENTA
                         </div>
-
-                        <h2 className={styles.sectionTitle}>
-                            Últimos Movimientos Bancarios
-                        </h2>
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>REFERENCIA</th>
-                                    <th>FECHA</th>
-                                    <th>DEBE</th>
-                                    <th>HABER</th>
-                                    <th>TIPO</th>
-                                    <th>ESTADO</th>
-                                    <th>ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pageMov.map((m, i) => (
-                                    <tr key={i}>
-                                        <td>{m.referencia}</td>
-                                        <td>{m.fecha}</td>
-                                        <td>{m.debe}</td>
-                                        <td>{m.haber}</td>
-                                        <td>{m.tipo}</td>
-                                        <td>{m.estado}</td>
-                                        <td>
-                                            <button className={styles.actionBtn}>📋</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPagesMov}
-                            onPageChange={setCurrentPage}
-                        />
-                    </>
-                )}
-
-                {activeTab === 'conciliaciones' && (
-                    <>
-                        <div className={styles.conciliacionForm}>
-                            <div>
-                                <label>Fecha:</label>
-                                <input
-                                    type="date"
-                                    value={concFecha}
-                                    onChange={e => setConcFecha(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label>Saldo Anterior:</label>
-                                <input
-                                    type="text"
-                                    value={concSaldoAnt}
-                                    onChange={e => setConcSaldoAnt(e.target.value)}
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div>
-                                <label>Saldo 2do Edo. Cta:</label>
-                                <input
-                                    type="text"
-                                    value={concSaldo2do}
-                                    onChange={e => setConcSaldo2do(e.target.value)}
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div>
-                                <label>Saldo Actual:</label>
-                                <input
-                                    type="text"
-                                    value={concSaldoAct}
-                                    onChange={e => setConcSaldoAct(e.target.value)}
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <button onClick={handleConciliar}>Conciliar</button>
+                        <div className={styles.balanceAmount}>
+                            {balance.replace(/\./g, ',')}₲
                         </div>
+                    </div>
 
-                        <h2 className={styles.sectionTitle}>Listado de Conciliaciones</h2>
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>REFERENCIA</th>
-                                    <th></th>
-                                    <th>FECHA EMISIÓN</th>
-                                    <th>FECHA CONCILIACIÓN</th>
-                                    <th>MONTO</th>
+                    <h2 className={styles.sectionTitle}>
+                        Últimos Movimientos Bancarios
+                    </h2>
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th>REFERENCIA</th>
+                                <th>FECHA</th>
+                                <th>DEBE</th>
+                                <th>HABER</th>
+                                <th>TIPO</th>
+                                <th>ESTADO</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {pageMov.map((m, i) => (
+                                <tr key={i}>
+                                    <td>{m.referencia}</td>
+                                    <td>{m.fecha}</td>
+                                    <td>{m.debe}</td>
+                                    <td>{m.haber}</td>
+                                    <td>{m.tipo}</td>
+                                    <td>{m.estado}</td>
+                                    <td>
+                                        <button className={styles.actionBtn}>📋</button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {pageCon.map((c, i) => (
-                                    <tr key={i}>
-                                        <td>{c.referencia}</td>
-                                        <td>
-                                            <input type="checkbox" />
-                                        </td>
-                                        <td>{c.fechaEmision}</td>
-                                        <td>{c.fechaConciliacion || '—'}</td>
-                                        <td>{c.monto}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                            ))}
+                        </tbody>
+                    </table>
 
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPagesCon}
-                            onPageChange={setCurrentPage}
-                        />
-                    </>
-                )}
-            </main>
-        </div>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPagesMov}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
+            )}
+
+            {activeTab === 'conciliaciones' && (
+                <>
+                    <div className={styles.conciliacionForm}>
+                        <div>
+                            <label>Fecha:</label>
+                            <input
+                                type="date"
+                                value={concFecha}
+                                onChange={e => setConcFecha(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label>Saldo Anterior:</label>
+                            <input
+                                type="text"
+                                value={concSaldoAnt}
+                                onChange={e => setConcSaldoAnt(e.target.value)}
+                                placeholder="0.00"
+                            />
+                        </div>
+                        <div>
+                            <label>Saldo 2do Edo. Cta:</label>
+                            <input
+                                type="text"
+                                value={concSaldo2do}
+                                onChange={e => setConcSaldo2do(e.target.value)}
+                                placeholder="0.00"
+                            />
+                        </div>
+                        <div>
+                            <label>Saldo Actual:</label>
+                            <input
+                                type="text"
+                                value={concSaldoAct}
+                                onChange={e => setConcSaldoAct(e.target.value)}
+                                placeholder="0.00"
+                            />
+                        </div>
+                        <button onClick={handleConciliar}>Conciliar</button>
+                    </div>
+
+                    <h2 className={styles.sectionTitle}>Listado de Conciliaciones</h2>
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th>REFERENCIA</th>
+                                <th></th>
+                                <th>FECHA EMISIÓN</th>
+                                <th>FECHA CONCILIACIÓN</th>
+                                <th>MONTO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {pageCon.map((c, i) => (
+                                <tr key={i}>
+                                    <td>{c.referencia}</td>
+                                    <td>
+                                        <input type="checkbox" />
+                                    </td>
+                                    <td>{c.fechaEmision}</td>
+                                    <td>{c.fechaConciliacion || '—'}</td>
+                                    <td>{c.monto}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPagesCon}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
+            )}
+        </main>
+        </div >
     )
 }
