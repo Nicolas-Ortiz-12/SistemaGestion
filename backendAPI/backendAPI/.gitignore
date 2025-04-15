@@ -1,0 +1,4 @@
+# Para la carpeta back (ASP.NET)
+bin/
+obj/
+*.log
