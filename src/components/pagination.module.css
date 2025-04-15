@@ -50,7 +50,7 @@
 }
 
 .pageNumber:hover {
-    color: var(--primary);
+    color: #1e4e79;
 }
 
 .pageNumberActive {

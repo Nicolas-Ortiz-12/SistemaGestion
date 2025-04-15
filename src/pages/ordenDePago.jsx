@@ -1,5 +1,5 @@
-import React from 'react';
-import { useState } from "react";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import Pagination from "../components/pagination";
 import styles from "./ordenDepago.module.css";
@@ -16,6 +16,7 @@ const facturas = [
     { fecha: '05-11-2024', nro: '001.001.000018', total: '1.250.000', saldo: '0', aplica: '1.250.000' },
     { fecha: '25-12-2024', nro: '001.001.000019', total: '1.500.000', saldo: '0', aplica: '1.500.000' }
 ];
+
 const proveedores = [
     {
         nombre: "Distribuidora Horeca",
@@ -23,7 +24,7 @@ const proveedores = [
         actividad: "Alimentos y bebidas",
         telefono: "+595985102897",
         email: "contacto@horecadist.com",
-    }, 
+    },
     {
         nombre: "Importadora Martínez",
         ruc: "1548796-3",
@@ -89,41 +90,59 @@ const proveedores = [
     },
 ];
 
+
 export default function OrdenDePago() {
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 12;
+    const navigate = useNavigate();
+    const [selectedIndices, setSelectedIndices] = useState([]);
+
+    const itemsPerPage = 10;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentFacturas = facturas.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(facturas.length / itemsPerPage);
+
+    const handleCheckboxChange = (globalIndex) => {
+        setSelectedIndices(prev => {
+            if (prev.includes(globalIndex)) {
+                return prev.filter(i => i !== globalIndex);
+            }
+            return [...prev, globalIndex];
+        });
+    };
+
+    const generarOrden = () => {
+        const seleccionadas = selectedIndices.map(i => facturas[i]);
+        navigate('/generarOrdenDePago', { state: { facturas: seleccionadas } });
+    };
+
     return (
         <div className={styles.container}>
             <main className={styles.main}>
                 <Header title="Orden de Pago" />
                 <form className={styles.form}>
+                    {/* Filtros de búsqueda */}
                     <div className={styles.inputDiv}>
                         <label>Proveedor:</label>
-                        <input input list="proveedores" className={styles.input} />
+                        <input list="proveedores" className={styles.input} />
                         <datalist id='proveedores'>
                             {proveedores.map((prov, index) => (
                                 <option key={index} value={prov.nombre} />
                             ))}
                         </datalist>
                     </div>
-
                     <div className={styles.inputDiv}>
-                        <label className="mb-1 font-semibold">Desde:</label>
+                        <label>Desde:</label>
                         <input type="date" className={styles.input} />
                     </div>
-
                     <div className={styles.inputDiv}>
                         <label>Hasta:</label>
                         <input type="date" className={styles.input} />
                     </div>
-
-                    <button type="submit" className={styles.boton}>
-                        Buscar
-                    </button>
+                    <button type="submit" className={styles.boton}>Buscar</button>
                 </form>
+
+
+                <h2 className={styles.texto}>Facturas Pendientes a Pago</h2>
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -132,29 +151,46 @@ export default function OrdenDePago() {
                             <th>Total</th>
                             <th>Saldo</th>
                             <th>Aplica</th>
-                            <th>Accion</th>
+                            <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentFacturas.map((fac, i) => (
-                            <tr key={i}>
-                                <td>{fac.fecha}</td>
-                                <td>{fac.nro}</td>
-                                <td>{fac.total}</td>
-                                <td>{fac.saldo}</td>
-                                <td>{fac.aplica}</td>
-                                <td>
-                                    <input type="checkbox" />
-                                </td>
-                            </tr>
-                        ))}
+                        {currentFacturas.map((fac, i) => {
+                            const globalIndex = startIndex + i;
+                            const checked = selectedIndices.includes(globalIndex);
+                            return (
+                                <tr key={globalIndex}>
+                                    <td>{fac.fecha}</td>
+                                    <td>{fac.nro}</td>
+                                    <td>{fac.total}</td>
+                                    <td>{fac.saldo}</td>
+                                    <td>{fac.aplica}</td>
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            checked={checked}
+                                            onChange={() => handleCheckboxChange(globalIndex)}
+                                        />
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
+
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
                 />
+
+                <button
+                    type="button"
+                    className={styles.buttonGenerar}
+                    onClick={generarOrden}
+                >
+                    Generar Orden de Pago
+                </button>
             </main>
         </div>
     );

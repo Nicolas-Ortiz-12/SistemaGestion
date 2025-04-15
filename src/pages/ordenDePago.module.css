@@ -16,6 +16,8 @@
     margin-top: 2rem;
     margin-left: 2rem;
     margin-bottom: 1rem;
+    justify-content: space-between;
+    width: 90%;
 }
 
 .inputDiv{
@@ -29,12 +31,13 @@
 }
 
 .boton {
-    background-color: #008DB1;
+    background-color: #1e4e79;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 12.5px 18px;
     border-radius: 4px;
     cursor: pointer;
+    margin-top: 1.2rem;
 }
 
 .table {
@@ -63,3 +66,20 @@ tr:nth-child(odd) {
 tr:nth-child(even) {
     background-color: white;
 }
+
+.buttonGenerar{
+    background-color: #23adad;
+    border: none;
+    padding: 0.7rem 0.5rem;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-left: 58.6rem;
+    color: #F2EFE7;
+}
+
+.texto{
+    margin-left: 2rem;
+    margin-bottom: 0.1rem;
+}
+

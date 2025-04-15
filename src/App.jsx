@@ -7,6 +7,7 @@ import MovimientoBancario from './pages/movimientoBancarios.jsx';
 import Proveedores from './pages/proveedores.jsx';
 import OrdenDePago from './pages/ordenDePago.jsx';
 import PantallaConSidebar from './components/pantallaConSidebar.jsx';
+import GenerarOrdenDePago from "./pages/generarOrdenDePago.jsx";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="" element={<Login />} />
         <Route path="inicio" element={<Inicio />} />
+        <Route path="generarOrdenDePago" element={<GenerarOrdenDePago/>} />
 
         <Route element={<PantallaConSidebar />}>
           <Route path="listaDeBancos" element={<ListaDeBancos />} />
