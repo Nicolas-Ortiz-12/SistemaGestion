@@ -1,52 +1,88 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const Form = () => {
-    const navigate = useNavigate();   // v6. En v5 usarías useHistory()
 
-    const handleSubmit = e => {
-        e.preventDefault();             // evita recarga
-        // aquí podrías validar usuario/password...
-        navigate('/inicio');         // ruta a la que quieres ir
-    };
-    return (
-        <StyledWrapper>
-            <div id="form-ui">
-                <form onSubmit={handleSubmit} id="form">
-                    <div id="form-body">
-                        <div id="welcome-lines">
-                            <div id="welcome-line-1">Iniciar Sesion</div>
-                            <div id="welcome-line-2"></div>
-                        </div>
-                        <div className="input-container">
-                            <input
-                                id="email"
-                                className="styled_input_bar"
-                                placeholder=" "
-                                required
-                            />
-                            <label className="input-label">Usuario</label>
-                        </div>
-                        <div className="input-container">
-                            <input
-                                type="password"
-                                id="password"
-                                className="styled_input_bar"
-                                placeholder=" "
-                                required
-                            />
-                            <label className="input-label">Contraseña</label>
-                        </div>
-                        <div id="submit-button-cvr">
-                            <button id="submit-button" type="submit">Ingresar</button>
-                        </div>
-                    </div>
-                </form>
+const Form = () => {
+  const [usuario, setUsuario] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setError('');
+
+    const formData = new FormData();
+    formData.append('usuario', usuario);
+    formData.append('password',password);
+
+    try {
+      const response = await fetch('https://localhost:5080/api/auth/login', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Error al iniciar sesión');
+      } else {
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('id', data.id);
+        navigate('inicio');
+      }
+    } catch (error) {
+      setError('Error en la solicitud');
+    }
+  };
+
+  return (
+    <StyledWrapper>
+      <div id="form-ui">
+        <form onSubmit={handleSubmit} id="form">
+          <div id="form-body">
+            <div id="welcome-lines">
+              <div id="welcome-line-1">Iniciar Sesión</div>
+              <div id="welcome-line-2"></div>
             </div>
-        </StyledWrapper>
-    );
-}
+
+            <div className="input-container">
+              <input
+                id="usuario"
+                className="styled_input_bar"
+                placeholder=" "
+                value={usuario}
+                onChange={e => setUsuario(e.target.value)}
+                required
+              />
+              <label className="input-label">Usuario</label>
+            </div>
+
+            <div className="input-container">
+              <input
+                type="password"
+                id="password"
+                className="styled_input_bar"
+                placeholder=" "
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
+              <label className="input-label">Contraseña</label>
+            </div>
+
+            {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+
+            <div id="submit-button-cvr">
+              <button id="submit-button" type="submit">Ingresar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </StyledWrapper>
+  );
+};
 
 const StyledWrapper = styled.div`
   display: flex;

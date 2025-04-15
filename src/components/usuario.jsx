@@ -1,7 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Button = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Limpiar almacenamiento local
+    localStorage.removeItem('token');
+    localStorage.removeItem('id');
+    // Redirigir al login
+    navigate('/');
+  };
   return (
     <StyledWrapper>
       <label className="popup">
@@ -9,7 +19,7 @@ const Button = () => {
         <div tabIndex={0} className="burger">
           <svg
             viewBox="0 0 24 24"
-            fill="#1e4e79"         
+            fill="#1e4e79"
             height={20}
             width={20}
             xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +30,7 @@ const Button = () => {
         <nav className="popup-window">
           <ul>
             <li>
-              <button>
+              <button onClick={handleLogout}>
                 <svg
                   width={30}
                   height={30}
