@@ -14,10 +14,9 @@
         public string Motivo { get; set; } = null!;
         public char TipoMov { get; set; }
 
-        public Cuenta Cuenta { get; set; } = null!;
+        [ForeignKey(nameof(IdCuenta))] // De esta forma se referencia mejor la clave foranea 
+        public Cuenta Cuenta { get; set; }
+        [ForeignKey(nameof(IdTransaccion))] //Referenciamos de mejor manera la clave foranea 
         public required Transaccion Transaccion { get; set; }
-
-        //Se quito un campo 
     }
-
 }

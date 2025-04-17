@@ -8,7 +8,7 @@ namespace BackenAPI.Models
         [Key]
         public int IdBancos { get; set; }
 
-        [ForeignKey("Pais")]
+        [ForeignKey(nameof(IdPais))] // De esta forma se referencia mejor la clave foranea 
         public int IdPais { get; set; }
 
         public required string Nombre { get; set; }

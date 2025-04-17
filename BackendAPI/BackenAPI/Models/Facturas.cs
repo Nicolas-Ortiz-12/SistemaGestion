@@ -12,7 +12,7 @@
         public DateOnly fecha_exp { get; set; }
 
         // clave foranea de proveedor // Se agrego required
-
+        [ForeignKey(nameof(id_prov))]
         public required Proveedores Proveedor { get; set; }
     }
 }

@@ -7,7 +7,7 @@
         public int IdMovi { get; set; }
         public DateTime FechaConciliacion { get; set; }
 
-        // Se agrego required
+        [ForeignKey(nameof(IdMovi))] // De esta forma se referencia mejor la clave foranea 
         public required Movimiento Movimiento { get; set; } 
     }
 }

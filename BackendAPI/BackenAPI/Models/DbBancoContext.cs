@@ -19,9 +19,8 @@ public class DbBancoContext : DbContext
     public DbSet<Conciliacion> Conciliaciones { get; set; }
     public DbSet<Transaccion> Transacciones { get; set; }
     public DbSet<Movimiento> Movimientos { get; set; }
-
-
-
+    public DbSet<OrdenDePago> OrdenesDePago {get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -169,6 +168,27 @@ public class DbBancoContext : DbContext
                 .HasForeignKey(c => c.IdMovi)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_Conciliaciones_Movimientos");
+        });
+        modelBuilder.Entity<OrdenDePago>(entity =>
+        {
+            entity.HasKey(e => e.IdOrden);
+            entity.ToTable("OrdenDePagos");
+
+            entity.Property(e => e.NroOrden)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasOne(e => e.Factura)
+                .WithMany() // Si una factura puede tener muchas órdenes
+                .HasForeignKey(e => e.IdFactura)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_OrdenDePago_Facturas");
+
+            entity.HasOne(e => e.Movimiento)
+                .WithMany() // Si un movimiento puede tener muchas órdenes
+                .HasForeignKey(e => e.IdMovi)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_OrdenDePago_Movimientos");
         });
     }
 }
