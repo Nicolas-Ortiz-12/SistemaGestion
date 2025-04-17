@@ -1,35 +1,46 @@
 // src/pages/ListaBancos.jsx
-import React from 'react';
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/header';
 import BankCard from '../components/bankCard';
 import agregarBanco from "../img/Agregar.png";
 import editarBanco from "../img/Editar.png";
 import styles from './listaDeBancos.module.css';
 
-const banks = [
-    { name: 'UENO BANK', type: 'Caja de Ahorro', account: '32132155', balance: '54.105.280 GS' },
-    { name: 'SUDAMERIS', type: 'Cuenta Corriente', account: '5646540', balance: '28.501.802 GS' },
-    { name: 'CONTINENTAL', type: 'Caja de Ahorro', account: '54464100', balance: '40.031.221 GS' },
-];
-
 export default function ListaDeBancos() {
+    const [cuentas, setCuentas] = useState([]);
+
+    useEffect(() => {
+        fetch('http://localhost:5285/api/Cuenta') // Asegurate de que esta sea la URL correcta
+            .then(res => {
+                if (!res.ok) throw new Error("Error al obtener cuentas");
+                return res.json();
+            })
+            .then(data => setCuentas(data))
+            .catch(error => console.error("Error:", error));
+    }, []);
+
     return (
         <div className={styles.container}>
             <main className={styles.main}>
-                <Header title="Lista de Bancos">
+                <Header title="Lista de Cuentas Bancarias">
                     <button><img src={agregarBanco} width={60} /></button>
                     <button><img src={editarBanco} width={60} /></button>
                 </Header>
                 <div className={styles.grid}>
-                    {banks.map((b, i) => (
+                    {cuentas.map((cuenta, i) => (
                         <Link
                             key={i}
-                            to='/movimientoBancarios'
-                            state={{ bank: b }}
+                            to="/movimientoBancarios"
+                            state={{ cuenta }}
                             style={{ textDecoration: 'none' }}
                         >
-                            <BankCard {...b} />
+                            <BankCard
+                                name={cuenta.banco.nombre}            // Nombre del banco
+                                type={cuenta.tCuenta}                 // Tipo de cuenta
+                                account={cuenta.nroCuenta}            // Número de cuenta
+                                balance={`${cuenta.saldo.toLocaleString()} GS`}  // Saldo formateado
+                            />
                         </Link>
                     ))}
                 </div>
@@ -37,4 +48,3 @@ export default function ListaDeBancos() {
         </div>
     );
 }
-
