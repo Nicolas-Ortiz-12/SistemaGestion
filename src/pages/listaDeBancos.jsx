@@ -11,7 +11,7 @@ export default function ListaDeBancos() {
     const [cuentas, setCuentas] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:5285/api/Cuenta') // Asegurate de que esta sea la URL correcta
+        fetch('https://localhost:7149/api/Cuenta') // Asegurate de que esta sea la URL correcta
             .then(res => {
                 if (!res.ok) throw new Error("Error al obtener cuentas");
                 return res.json();
