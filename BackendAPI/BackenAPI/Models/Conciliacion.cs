@@ -7,6 +7,7 @@
         public int IdMovi { get; set; }
         public DateTime FechaConciliacion { get; set; }
 
-        public Movimiento Movimiento { get; set; }
+        // Se agrego required
+        public required Movimiento Movimiento { get; set; } 
     }
 }

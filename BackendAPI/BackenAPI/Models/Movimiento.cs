@@ -9,14 +9,15 @@
         public DateTime Fecha { get; set; }
         public int Monto { get; set; }
         public long CtaDestino { get; set; }
-        public string Beneficiario { get; set; }
-        public string Concepto { get; set; }
-        public string Motivo { get; set; }
+        public required string Beneficiario { get; set; }
+        public string Concepto { get; set; } = null!;
+        public string Motivo { get; set; } = null!;
         public char TipoMov { get; set; }
 
-        public Cuenta Cuenta { get; set; }
-        public Transaccion Transaccion { get; set; }
-        public Conciliacion Conciliacion { get; set; }
+        public Cuenta Cuenta { get; set; } = null!;
+        public required Transaccion Transaccion { get; set; }
+
+        //Se quito un campo 
     }
 
 }
