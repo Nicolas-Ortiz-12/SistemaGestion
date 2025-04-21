@@ -1,0 +1,74 @@
+:root {
+    --primary: #23adad;
+    --greyLight: #23adade1;
+    --greyDark: #2d4848;
+}
+
+/* UL.page mini y transparente */
+.page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5rem 0;
+    padding: 0;
+    list-style: none;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0.3rem;
+}
+
+/* Flechas */
+.pageBtn {
+    color: var(--greyLight);
+    margin: 0 0.4rem;
+    font-size: 1rem;
+    cursor: default;
+    transition: color 0.2s ease;
+}
+
+.pageBtnActive {
+    color: var(--greyDark);
+    cursor: pointer;
+}
+
+.pageBtnActive:hover {
+    color: var(--primary);
+}
+
+/* Números */
+.pageNumber {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin: 0 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 0.2rem;
+    transition: color 0.3s ease;
+}
+
+.pageNumber:hover {
+    color: #1e4e79;
+}
+
+.pageNumberActive {
+    color: #ffffff;
+    background: var(--primary);
+    font-weight: 600;
+    border: 1px solid var(--primary);
+}
+
+/* Puntos */
+.pageDots {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin: 0 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--greyLight);
+    font-size: 1rem;
+    cursor: default;
+}

@@ -1,0 +1,85 @@
+.container {
+    display: flex;
+
+}
+
+.main {
+    flex: 1;
+    background-color: #f6f1e9;
+    min-height: 100vh;
+}
+
+.form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+    justify-content: space-between;
+    width: 90%;
+}
+
+.inputDiv{
+    display: flex;
+    flex-direction: column;
+}
+
+.input {
+    padding: 10px;
+    width: 280px;
+}
+
+.boton {
+    background-color: #1e4e79;
+    color: white;
+    border: none;
+    padding: 12.5px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1.2rem;
+}
+
+.table {
+    width: 90%;
+    border-collapse: collapse;
+    margin-left: 2rem;
+}
+
+.table th,
+.table td {
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #ddd;
+    align-items: center;
+}
+
+.table th {
+    background-color: #265073;
+    color: white;
+}
+
+tr:nth-child(odd) {
+    background-color: #F2EFE7;
+}
+
+tr:nth-child(even) {
+    background-color: white;
+}
+
+.buttonGenerar{
+    background-color: #23adad;
+    border: none;
+    padding: 0.7rem 0.5rem;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-left: 58.6rem;
+    color: #F2EFE7;
+}
+
+.texto{
+    margin-left: 2rem;
+    margin-bottom: 0.1rem;
+}
+

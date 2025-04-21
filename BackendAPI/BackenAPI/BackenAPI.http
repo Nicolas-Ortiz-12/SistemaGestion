@@ -1,0 +1,6 @@
+@BackenAPI_HostAddress = http://localhost:5000
+
+GET {{BackenAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

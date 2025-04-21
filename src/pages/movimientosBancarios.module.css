@@ -1,0 +1,106 @@
+.container {
+    display: flex;
+}
+
+.main {
+    flex: 1;
+    background-color: #f6f1e9;
+    min-height: 100vh;
+}
+
+.balanceCard {
+    background: #1e4e79;
+    color: white;
+    border-radius: 20px;
+    width: 30%;
+    max-width: 600px;
+    height: 200px;
+    margin: 1.5rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0.5em 1em #006E8C;
+}
+
+.balanceTitle {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    
+}
+
+.balanceAmount {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+}
+
+.sectionTitle {
+    margin: 0rem 3.5rem 0rem 3.5rem;
+}
+
+.table {
+    width: 90%;
+    border-collapse: collapse;
+    margin-left: 3.5rem;
+}
+
+.table th,
+.table td {
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #ddd;
+    align-items: center;
+}
+
+.table th {
+    background-color: #265073;
+    color: white;
+}
+
+tr:nth-child(odd) {
+    background-color: #F2EFE7;
+}
+
+tr:nth-child(even) {
+    background-color: white;
+}
+
+.actionBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.conciliacionForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1.5rem 3.5rem;
+    align-items: flex-end;
+}
+
+.conciliacionForm div {
+    display: flex;
+    flex-direction: column;
+}
+
+.conciliacionForm label {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.conciliacionForm input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.conciliacionForm button {
+    padding: 0.6rem 1.2rem;
+    background-color: #1e4e79;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
