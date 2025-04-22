@@ -12,13 +12,15 @@ export default function ModalAgregarBanco({ onClose, onAgregarBanco }) {
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2>Agregar Banco</h2>
+          <h2>Agregar Cuenta Bancaria</h2>
         </div>
 
         <div className={styles.form}>
           <label>País:</label>
           <select className={styles.input}>
             <option>Paraguay</option>
+            <option>Argentina</option>
+            <option>Brasil</option>
           </select>
 
           <label>Banco:</label>
@@ -30,7 +32,11 @@ export default function ModalAgregarBanco({ onClose, onAgregarBanco }) {
           <label>Tipo de cuenta:</label>
           <select className={styles.input}>
             <option>Cuenta Corriente</option>
+            <option>Caja de Ahorro</option>
           </select>
+
+          <label>Nombre del titular:</label>
+          <input className={styles.select}/>
 
           <label>Número de cuenta:</label>
           <input className={styles.select}/>
