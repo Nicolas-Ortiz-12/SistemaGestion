@@ -104,6 +104,15 @@
     border: 1px solid #ccc;
     font-size: 15px;
   }
+
+  .select {
+    width: 97%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+  }
   
   /* Reutilizando lo que ya tenés para el modal, botones, etc */
   

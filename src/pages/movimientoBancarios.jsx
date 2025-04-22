@@ -61,7 +61,6 @@ export default function MovimientosBancarios() {
     }, [state, navigate])
 
     if (!state?.bank) return null
-    const { name, type, balance } = state.bank
 
     // para movimientos
     const startMov = (currentPage - 1) * itemsPerPageMov
@@ -83,8 +82,12 @@ export default function MovimientosBancarios() {
     }
     const [isModalOpen, setModalOpen] = useState(false);
 
-
+    const name = state.bank.nombre;
+    const type = state.account.tCuenta;
+    const balance = state.account.saldo;
+    console.log(balance);
     return (
+        
         <div className={styles.container}>
             <main className={styles.main}>
                 <Header title={`${name} – ${type}`}>
@@ -110,7 +113,7 @@ export default function MovimientosBancarios() {
                             SALDO TOTAL<br />DE LA CUENTA
                         </div>
                         <div className={styles.balanceAmount}>
-                            {balance.replace(/\./g, ',')}₲
+                            {balance.toLocaleString('es-PY')}₲
                         </div>
                     </div>
 

@@ -37,7 +37,7 @@ export default function ListaDeBancos() {
                         <Link
                             key={i}
                             to="/movimientoBancarios"
-                            state={{ cuenta }}
+                            state={{ account:cuenta, bank:cuenta.banco }}
                             style={{ textDecoration: 'none' }}
                         >
                             <BankCard

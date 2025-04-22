@@ -4,7 +4,7 @@ import styles from './modalesBanco.module.css';
 export default function ModalAgregarBanco({ onClose, onAgregarBanco }) {
   const handleBancoChange = (e) => {
     if (e.target.value === 'agregar') {
-      onAgregarBanco(); // abre el modal de registrar banco
+      onAgregarBanco(); 
     }
   };
 
@@ -33,7 +33,7 @@ export default function ModalAgregarBanco({ onClose, onAgregarBanco }) {
           </select>
 
           <label>Número de cuenta:</label>
-          <input className={styles.input} defaultValue="512031564" />
+          <input className={styles.select}/>
 
           <div className={styles.buttons}>
             <button className={styles.save}>Guardar</button>
