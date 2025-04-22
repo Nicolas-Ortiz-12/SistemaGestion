@@ -3,40 +3,52 @@
   "WorkspaceRootPath": "C:\\Users\\no684\\source\\repos\\BackendAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\movimiento.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\movimiento.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\cuenta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\cuenta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\conciliacion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\conciliacion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\facturas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\facturas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\banco.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\banco.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\transaccion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\transaccion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\ordendepago.cs||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\ordendepago.cs||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\dbbancocontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\dbbancocontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\cuenta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\cuenta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\pais.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\pais.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\proveedores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\proveedores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\transaccion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\transaccion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\ordendepago.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\ordendepago.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\usuario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\usuario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\facturas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\facturas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\dbbancocontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\dbbancocontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\controllers\\bancocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\controllers\\bancocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\models\\movimiento.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|solutionrelative:backenapi\\models\\movimiento.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9D1859CE-BD68-44B3-AC7F-26D12881A070}|BackenAPI\\BackenAPI.csproj|c:\\users\\no684\\source\\repos\\backendapi\\backenapi\\controllers\\ordendepagocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -54,8 +66,45 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Pais.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Pais.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\Pais.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Pais.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\Pais.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T01:18:35.132Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Cuenta.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Cuenta.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\Cuenta.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Cuenta.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\Cuenta.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T00:16:22.446Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Banco.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Banco.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\Banco.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Banco.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\Banco.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T00:32:17.733Z"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 1,
@@ -64,92 +113,49 @@
               "RelativeDocumentMoniker": "BackenAPI\\Models\\Conciliacion.cs",
               "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Conciliacion.cs",
               "RelativeToolTip": "BackenAPI\\Models\\Conciliacion.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAzAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:32:11.031Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-22T00:32:11.031Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Facturas.cs",
-              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Facturas.cs",
-              "RelativeDocumentMoniker": "BackenAPI\\Models\\Facturas.cs",
-              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Facturas.cs",
-              "RelativeToolTip": "BackenAPI\\Models\\Facturas.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:32:00.754Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Movimiento.cs",
-              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Movimiento.cs",
-              "RelativeDocumentMoniker": "BackenAPI\\Models\\Movimiento.cs",
-              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Movimiento.cs*",
-              "RelativeToolTip": "BackenAPI\\Models\\Movimiento.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:31:51.135Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 4,
               "Title": "Proveedores.cs",
               "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Proveedores.cs",
               "RelativeDocumentMoniker": "BackenAPI\\Models\\Proveedores.cs",
               "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Proveedores.cs",
               "RelativeToolTip": "BackenAPI\\Models\\Proveedores.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:31:08.408Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-22T00:31:08.408Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "DbBancoContext.cs",
-              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\DbBancoContext.cs",
-              "RelativeDocumentMoniker": "BackenAPI\\Models\\DbBancoContext.cs",
-              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\DbBancoContext.cs",
-              "RelativeToolTip": "BackenAPI\\Models\\DbBancoContext.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAgwBUAAAAXAAAAAAAAAA==",
+              "Title": "Transaccion.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Transaccion.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\Transaccion.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Transaccion.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\Transaccion.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:28:42.441Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "OrdenDePagoController.cs",
-              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Controllers\\OrdenDePagoController.cs",
-              "RelativeDocumentMoniker": "BackenAPI\\Controllers\\OrdenDePagoController.cs",
-              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Controllers\\OrdenDePagoController.cs",
-              "RelativeToolTip": "BackenAPI\\Controllers\\OrdenDePagoController.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAgwAIAAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:27:15.933Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-22T00:16:08.715Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "Cuenta.cs",
-              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Cuenta.cs",
-              "RelativeDocumentMoniker": "BackenAPI\\Models\\Cuenta.cs",
-              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Cuenta.cs",
-              "RelativeToolTip": "BackenAPI\\Models\\Cuenta.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAATAAAAAAAAAA==",
+              "Title": "OrdenDePago.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\OrdenDePago.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\OrdenDePago.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\OrdenDePago.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\OrdenDePago.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:16:22.446Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-22T00:35:48.251Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 7,
               "Title": "Usuario.cs",
               "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Usuario.cs",
               "RelativeDocumentMoniker": "BackenAPI\\Models\\Usuario.cs",
@@ -157,38 +163,59 @@
               "RelativeToolTip": "BackenAPI\\Models\\Usuario.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:16:41.746Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Transaccion.cs",
-              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Transaccion.cs",
-              "RelativeDocumentMoniker": "BackenAPI\\Models\\Transaccion.cs",
-              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Transaccion.cs",
-              "RelativeToolTip": "BackenAPI\\Models\\Transaccion.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:16:08.715Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "OrdenDePago.cs",
-              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\OrdenDePago.cs",
-              "RelativeDocumentMoniker": "BackenAPI\\Models\\OrdenDePago.cs",
-              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\OrdenDePago.cs",
-              "RelativeToolTip": "BackenAPI\\Models\\OrdenDePago.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:14:06.851Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-22T00:16:41.746Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 10,
+              "Title": "BancoController.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Controllers\\BancoController.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Controllers\\BancoController.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Controllers\\BancoController.cs",
+              "RelativeToolTip": "BackenAPI\\Controllers\\BancoController.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T01:14:56.707Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Facturas.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Facturas.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\Facturas.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Facturas.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\Facturas.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T00:32:00.754Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Movimiento.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Movimiento.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\Movimiento.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\Movimiento.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\Movimiento.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T00:31:51.135Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DbBancoContext.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\DbBancoContext.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Models\\DbBancoContext.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Models\\DbBancoContext.cs",
+              "RelativeToolTip": "BackenAPI\\Models\\DbBancoContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T00:28:42.441Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
               "Title": "DbBancoContextModelSnapshot.cs",
               "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Migrations\\DbBancoContextModelSnapshot.cs",
               "RelativeDocumentMoniker": "BackenAPI\\Migrations\\DbBancoContextModelSnapshot.cs",
@@ -196,8 +223,19 @@
               "RelativeToolTip": "BackenAPI\\Migrations\\DbBancoContextModelSnapshot.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-22T00:28:37.729Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-22T00:28:37.729Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "OrdenDePagoController.cs",
+              "DocumentMoniker": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Controllers\\OrdenDePagoController.cs",
+              "RelativeDocumentMoniker": "BackenAPI\\Controllers\\OrdenDePagoController.cs",
+              "ToolTip": "C:\\Users\\no684\\source\\repos\\BackendAPI\\BackenAPI\\Controllers\\OrdenDePagoController.cs",
+              "RelativeToolTip": "BackenAPI\\Controllers\\OrdenDePagoController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-22T00:27:15.933Z"
             }
           ]
         }

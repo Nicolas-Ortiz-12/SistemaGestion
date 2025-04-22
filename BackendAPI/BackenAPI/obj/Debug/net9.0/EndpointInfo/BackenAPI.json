@@ -1849,7 +1849,8 @@
           },
           "ctaDestino": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "nullable": true
           },
           "beneficiario": {
             "type": "string",

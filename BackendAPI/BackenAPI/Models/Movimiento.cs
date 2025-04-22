@@ -12,10 +12,10 @@ namespace BackenAPI.Models
         public int IdTran { get; set; }
         public DateTime Fecha { get; set; }
         public int Monto { get; set; }
-        public long CtaDestino { get; set; }
+        public long? CtaDestino { get; set; } 
         public required string Beneficiario { get; set; }
-        public string Concepto { get; set; } = null!;
-        public string Motivo { get; set; } = null!;
+        public string? Concepto { get; set; } = null!;
+        public string? Motivo { get; set; } = null!;
         public char TipoMov { get; set; }
 
         [ForeignKey(nameof(IdCuenta))] // De esta forma se referencia mejor la clave foranea 
