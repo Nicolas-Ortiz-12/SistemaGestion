@@ -1,9 +1,10 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
 namespace BackenAPI.Models
 {
-
-       public class OrdenDePago
+    public class OrdenDePago
     {
-        [Key]
         public int IdOrden { get; set; }
 
         public int IdFactura { get; set; }
@@ -13,10 +14,11 @@ namespace BackenAPI.Models
         public string NroOrden { get; set; } = string.Empty;
 
         [ForeignKey(nameof(IdFactura))]// De esta forma se referencia mejor la clave foranea 
-        public required Factura Factura { get; set; }
+        public required Facturas Factura { get; set; }
 
         [ForeignKey(nameof(IdMovi))] // De esta forma se referencia mejor la clave foranea 
         public required Movimiento Movimiento { get; set; }
     }
-
 }
+
+

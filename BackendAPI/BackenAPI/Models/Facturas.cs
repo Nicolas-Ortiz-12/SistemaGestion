@@ -1,4 +1,8 @@
-﻿namespace BackenAPI.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+
+namespace BackenAPI.Models
 {
     public partial class Facturas
     {

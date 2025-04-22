@@ -1,4 +1,8 @@
-﻿namespace BackenAPI.Models
+﻿
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BackenAPI.Models
 {
 
     public class Movimiento
@@ -16,7 +20,7 @@
 
         [ForeignKey(nameof(IdCuenta))] // De esta forma se referencia mejor la clave foranea 
         public Cuenta Cuenta { get; set; }
-        [ForeignKey(nameof(IdTransaccion))] //Referenciamos de mejor manera la clave foranea 
+        [ForeignKey(nameof(IdTran))] //Referenciamos de mejor manera la clave foranea 
         public required Transaccion Transaccion { get; set; }
     }
 }
