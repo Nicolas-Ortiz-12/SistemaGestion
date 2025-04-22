@@ -5,7 +5,8 @@ import Pagination from "../components/pagination";
 import agregarProveedorImg from "../img/icono2.png";
 import editarImg from "../img/icono3.png";
 import styles from "./proveedores.module.css";
-
+import ModalAgregarProveedor from '../components/modalAgregarProveedor';
+import ModalEditarProveedor from '../components/modalEditarProveedor';
 const proveedores = [
     {
         nombre: "Distribuidora Horeca",
@@ -13,7 +14,7 @@ const proveedores = [
         actividad: "Alimentos y bebidas",
         telefono: "+595985102897",
         email: "contacto@horecadist.com",
-    }, 
+    },
     {
         nombre: "Importadora Martínez",
         ruc: "1548796-3",
@@ -82,21 +83,34 @@ const proveedores = [
 
 export default function Proveedores() {
     const [currentPage, setCurrentPage] = useState(1);
+    const [tipoModal, setTipoModal] = useState(null);
+    const [proveedorSeleccionado, setProveedorSeleccionado] = useState(null);
+
     const itemsPerPage = 12;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentProveedores = proveedores.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(proveedores.length / itemsPerPage);
+
+    const abrirModalEditar = (proveedor) => {
+        setProveedorSeleccionado(proveedor);
+        setTipoModal("editar");
+    };
+
     return (
         <div className={styles.container}>
             <main className={styles.main}>
                 <Header title="Proveedores">
-                    <button><img src={agregarProveedorImg} width={60} /></button>
+                    <button onClick={() => setTipoModal("agregar")}>
+                        <img src={agregarProveedorImg} width={60} />
+                    </button>
                 </Header>
+
                 <div className={styles.buscador}>
                     <label>Buscar proveedor:</label>
                     <input className={styles.input} placeholder="Buscar (RUC | Nombre | Correo)" />
                     <button className={styles.boton}>Buscar</button>
                 </div>
+
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -117,17 +131,38 @@ export default function Proveedores() {
                                 <td>{prov.telefono}</td>
                                 <td>{prov.email}</td>
                                 <td>
-                                    <button className={styles.actionBtn}><img src={editarImg} /></button>
+                                    <button
+                                        className={styles.actionBtn}
+                                        onClick={() => abrirModalEditar(prov)}
+                                    >
+                                        <img src={editarImg} width={24} />
+                                    </button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
                 />
+
+                {/* Modales */}
+                {tipoModal === "agregar" && (
+                    <ModalAgregarProveedor onClose={() => setTipoModal(null)} />
+                )}
+
+                {tipoModal === "editar" && proveedorSeleccionado && (
+                    <ModalEditarProveedor
+                        proveedor={proveedorSeleccionado}
+                        onClose={() => {
+                            setTipoModal(null);
+                            setProveedorSeleccionado(null);
+                        }}
+                    />
+                )}
             </main>
         </div>
     );
