@@ -14,30 +14,41 @@ export default function ListaDeBancos() {
     const [cuentas, setCuentas] = useState([]);
     const [tipoModal, setTipoModal] = useState(null);
 
+    // 1️⃣ Función para traer las cuentas
+    const fetchCuentas = async () => {
+        try {
+            const res = await fetch('https://localhost:7149/api/Cuenta');
+            if (!res.ok) throw new Error('Error al obtener cuentas');
+            const data = await res.json();
+            setCuentas(data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    // 2️⃣ Al montar, cargo la lista
     useEffect(() => {
-        fetch('https://localhost:7149/api/Cuenta')
-            .then(res => {
-                if (!res.ok) throw new Error("Error al obtener cuentas");
-                return res.json();
-            })
-            .then(data => setCuentas(data))
-            .catch(error => console.error("Error:", error));
+        fetchCuentas();
     }, []);
 
     return (
         <div className={styles.container}>
             <main className={styles.main}>
                 <Header title="Lista de Cuentas Bancarias">
-                    <button onClick={() => setTipoModal('agregar')}><img src={agregarBanco} width={60} /></button>
-                    <button onClick={() => setTipoModal('editar')}><img src={editarBanco} width={60} /></button>
-
+                    <button onClick={() => setTipoModal('agregar')}>
+                        <img src={agregarBanco} width={60} />
+                    </button>
+                    <button onClick={() => setTipoModal('editar')}>
+                        <img src={editarBanco} width={60} />
+                    </button>
                 </Header>
+
                 <div className={styles.grid}>
                     {cuentas.map((cuenta, i) => (
                         <Link
                             key={i}
                             to="/movimientoBancarios"
-                            state={{ account:cuenta, bank:cuenta.banco }}
+                            state={{ account: cuenta, bank: cuenta.banco }}
                             style={{ textDecoration: 'none' }}
                         >
                             <BankCard
@@ -49,11 +60,26 @@ export default function ListaDeBancos() {
                         </Link>
                     ))}
                 </div>
-                {tipoModal === 'agregar' && <ModalAgregarBanco onClose={() => setTipoModal(null)} />}
-                {tipoModal === 'editar' && (<ModalElegirCuenta onClose={() => setTipoModal(null)} onContinuar={() => setTipoModal('editarBanco')} />)}
-                {tipoModal === 'editarBanco' && (<ModalEditarBanco onClose={() => setTipoModal(null)} />)}
 
+                {tipoModal === 'agregar' && (
+                    <ModalAgregarBanco
+                        onClose={() => setTipoModal(null)}
+                        onCuentaCreada={async () => {
+                            await fetchCuentas();    // recarga lista
+                            setTipoModal(null);      // cierra modal
+                        }}
+                    />
+                )}
+                {tipoModal === 'editar' && (
+                    <ModalElegirCuenta
+                        onClose={() => setTipoModal(null)}
+                        onContinuar={() => setTipoModal('editarBanco')}
+                    />
+                )}
+                {tipoModal === 'editarBanco' && (
+                    <ModalEditarBanco onClose={() => setTipoModal(null)} />
+                )}
             </main>
         </div>
-    );
-}
+    )
+}  

@@ -21,7 +21,7 @@ export default function Proveedores() {
     const currentProveedores = proveedores.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(proveedores.length / itemsPerPage);
 
-    useEffect(() => {
+    /*useEffect(() => {
         fetch('https://localhost:7149/api/Proveedores')
             .then(res => {
                 if (!res.ok) throw new Error("Error al obtener proveedores");
@@ -29,7 +29,7 @@ export default function Proveedores() {
             })
             .then(data => setProveedores(data))
             .catch(error => console.error("Error:", error));
-    }, []);
+    }, []);*/
 
     const abrirModalEditar = (proveedor) => {
         setProveedorSeleccionado(proveedor);
