@@ -70,22 +70,18 @@ export default function ModalAgregarBanco({ onClose, onAgregarBanco }) {
     }
 
     // Preparar los datos a enviar
-    const cuentaData = {
-      nroCuenta: parseInt(numeroCuenta),
-      saldo: 0,
-      nombre: propietario,
-      tCuenta: tipoCuenta,
-      idBancos: bancoSeleccionado.idBancos, // ID del banco
-       // Objeto Banco completo
-    };
+    const form = new FormData();
+    form.append('numero', numeroCuenta);
+    form.append('saldo', '0');
+    form.append('nombre', propietario);
+    form.append('tCuenta', tipoCuenta);
+    form.append('bancoId', bancoSeleccionado.idBancos);
 
-    console.log("Datos a enviar:", cuentaData);
 
     try {
       const response = await fetch('https://localhost:7149/api/Cuenta', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cuentaData)
+        body: form
       });
 
       const responseData = await response.json();

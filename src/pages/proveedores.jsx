@@ -7,89 +7,29 @@ import editarImg from "../img/icono3.png";
 import styles from "./proveedores.module.css";
 import ModalAgregarProveedor from '../components/modalAgregarProveedor';
 import ModalEditarProveedor from '../components/modalEditarProveedor';
-const proveedores = [
-    {
-        nombre: "Distribuidora Horeca",
-        ruc: "5896759-8",
-        actividad: "Alimentos y bebidas",
-        telefono: "+595985102897",
-        email: "contacto@horecadist.com",
-    },
-    {
-        nombre: "Importadora Martínez",
-        ruc: "1548796-3",
-        actividad: "Importación de tecnología",
-        telefono: "+595971456789",
-        email: "ventas@importmartinez.com",
-    },
-    {
-        nombre: "AgroPar S.A.",
-        ruc: "4785962-5",
-        actividad: "Agroquímicos",
-        telefono: "+595981332211",
-        email: "info@agropar.com.py",
-    },
-    {
-        nombre: "Construland",
-        ruc: "3012547-1",
-        actividad: "Materiales de construcción",
-        telefono: "+595983112233",
-        email: "pedidos@construland.com",
-    },
-    {
-        nombre: "Eco Print",
-        ruc: "1247859-9",
-        actividad: "Impresiones y papelería",
-        telefono: "+595991998877",
-        email: "eco@printpy.com",
-    },
-    {
-        nombre: "Global Repuestos",
-        ruc: "8547962-6",
-        actividad: "Repuestos de vehículos",
-        telefono: "+595981223344",
-        email: "contacto@globalrepuestos.com",
-    },
-    {
-        nombre: "Farmacenter",
-        ruc: "3054179-0",
-        actividad: "Distribución farmacéutica",
-        telefono: "+595985112200",
-        email: "ventas@farmacenter.com",
-    },
-    {
-        nombre: "CleanUp S.A.",
-        ruc: "7765412-4",
-        actividad: "Productos de limpieza",
-        telefono: "+595982765432",
-        email: "soporte@cleanuppsa.com",
-    },
-    {
-        nombre: "Distribuciones Frutales",
-        ruc: "1592634-2",
-        actividad: "Frutas y verduras",
-        telefono: "+595980456789",
-        email: "frutas@distribuciones.com",
-    },
-    {
-        nombre: "Eléctrica Zeta",
-        ruc: "2014579-1",
-        actividad: "Materiales eléctricos",
-        telefono: "+595986123456",
-        email: "ventas@zetaelectric.com",
-    },
-];
+
 
 
 export default function Proveedores() {
     const [currentPage, setCurrentPage] = useState(1);
     const [tipoModal, setTipoModal] = useState(null);
     const [proveedorSeleccionado, setProveedorSeleccionado] = useState(null);
+    const [proveedores, setProveedores] = useState([]);
 
     const itemsPerPage = 12;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentProveedores = proveedores.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(proveedores.length / itemsPerPage);
+
+    useEffect(() => {
+        fetch('https://localhost:7149/api/Proveedores')
+            .then(res => {
+                if (!res.ok) throw new Error("Error al obtener proveedores");
+                return res.json();
+            })
+            .then(data => setProveedores(data))
+            .catch(error => console.error("Error:", error));
+    }, []);
 
     const abrirModalEditar = (proveedor) => {
         setProveedorSeleccionado(proveedor);
@@ -123,7 +63,7 @@ export default function Proveedores() {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentProveedores.map((prov, i) => (
+                        {proveedores.map((prov, i) => (
                             <tr key={i}>
                                 <td>{prov.nombre}</td>
                                 <td>{prov.ruc}</td>
