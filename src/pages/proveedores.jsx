@@ -14,7 +14,7 @@ export default function Proveedores() {
     const [proveedores, setProveedores] = useState([]);
     const [busqueda, setBusqueda] = useState("");
 
-    const itemsPerPage = 12;
+    const itemsPerPage = 5;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentProveedores = proveedores.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(proveedores.length / itemsPerPage);
@@ -29,7 +29,10 @@ export default function Proveedores() {
                 if (!res.ok) throw new Error("Error al obtener proveedores");
                 return res.json();
             })
-            .then(data => setProveedores(data))
+            .then(data => {
+                setCurrentPage(1); // 👈 Reinicia la página después de actualizar
+                setProveedores(data);
+            })
             .catch(error => console.error("Error:", error));
     };
 
@@ -120,7 +123,10 @@ export default function Proveedores() {
                 />
 
                 {tipoModal === "agregar" && (
-                    <ModalAgregarProveedor onClose={cerrarModal} />
+                    <ModalAgregarProveedor
+                        onClose={cerrarModal}
+                        onSuccess={fetchProveedores} // 👈 Actualiza lista después de agregar
+                    />
                 )}
 
                 {tipoModal === "editar" && proveedorSeleccionado && (

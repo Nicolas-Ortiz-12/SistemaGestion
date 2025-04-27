@@ -15,7 +15,7 @@ export default function ModalEditarBanco({ onClose }) {
           <select className={styles.input}>
             <option>Paraguay</option>
           </select>
-
+    
           <label>Banco:</label>
           <div className={styles.inputWithIcon}>
             <select className={styles.input} style={{ flex: 1 }}>

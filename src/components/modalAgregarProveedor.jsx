@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './modalAgregarEditarProveedor.module.css';
 
-export default function ModalAgregarProveedor({ onClose }) {
+export default function ModalAgregarProveedor({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     nombre: '',
     ruc: '',
@@ -28,9 +28,8 @@ export default function ModalAgregarProveedor({ onClose }) {
       form.append('ruc', formData.ruc);
       form.append('correo', formData.correo);
       form.append('telefono', formData.telefono);
-      form.append('direccion',formData.direccion);
-      form.append('actividad',formData.actividad);
-
+      form.append('direccion', formData.direccion);
+      form.append('actividad', formData.actividad);
 
       const response = await fetch('https://localhost:7149/api/Proveedores', {
         method: 'POST',
@@ -42,8 +41,8 @@ export default function ModalAgregarProveedor({ onClose }) {
         throw new Error(message || 'Error al guardar proveedor');
       }
 
-      alert('Proveedor agregado exitosamente');
-      onClose();
+      onSuccess(); // 👈 Actualiza la lista
+      onClose();   // 👈 Cierra el modal
     } catch (error) {
       console.error(error);
       alert('Error al agregar proveedor');
