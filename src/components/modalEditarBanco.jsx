@@ -117,7 +117,6 @@ export default function ModalEditarBanco({ cuenta, onClose, onCuentaActualizada 
             <option key="Cuenta Corriente" value="Cuenta Corriente">Cuenta Corriente</option>
             <option key="Caja de Ahorro" value="Caja de Ahorro">Caja de Ahorro</option>
           </select>
-<<<<<<< HEAD
 
           <label htmlFor="bancoId">Banco:</label>
           <select
@@ -133,20 +132,6 @@ export default function ModalEditarBanco({ cuenta, onClose, onCuentaActualizada 
                 {b.nombre}
               </option>
             ))}
-=======
-    
-          <label>Banco:</label>
-          <div className={styles.inputWithIcon}>
-            <select className={styles.input} style={{ flex: 1 }}>
-              <option>Sudameris</option>
-            </select>
-            <button className={styles.addButton}>＋</button>
-          </div>
-
-          <label>Tipo de cuenta:</label>
-          <select className={styles.input}>
-            <option>Cuenta Corriente</option>
->>>>>>> 88e414c9c8d31961bc6a547e6733b8feef023a7f
           </select>
 
           <div className={styles.buttons}>
