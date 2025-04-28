@@ -1,4 +1,3 @@
-// src/pages/ListaBancos.jsx 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/header';
@@ -13,8 +12,9 @@ import styles from './listaDeBancos.module.css';
 export default function ListaDeBancos() {
     const [cuentas, setCuentas] = useState([]);
     const [tipoModal, setTipoModal] = useState(null);
+    const [cuentaSeleccionada, setCuentaSeleccionada] = useState(null);
 
-    // 1️⃣ Función para traer las cuentas
+    // 1️⃣ Traer las cuentas desde el servidor
     const fetchCuentas = async () => {
         try {
             const res = await fetch('https://localhost:7149/api/Cuenta');
@@ -26,10 +26,25 @@ export default function ListaDeBancos() {
         }
     };
 
-    // 2️⃣ Al montar, cargo la lista
     useEffect(() => {
         fetchCuentas();
     }, []);
+
+    // 2️⃣ Abrir modal de elegir cuenta
+    const abrirModalElegir = () => {
+        setTipoModal('editar');
+    };
+
+    // 3️⃣ Recibe la cuenta desde ModalElegirCuenta
+    const handleContinuar = (cuenta) => {
+        setCuentaSeleccionada(cuenta);
+        setTipoModal('editarBanco');
+    };
+
+    // 4️⃣ Cierra modal de editar
+    const handleCerrarEditar = () => {
+        setTipoModal(null);
+    };
 
     return (
         <div className={styles.container}>
@@ -38,7 +53,7 @@ export default function ListaDeBancos() {
                     <button onClick={() => setTipoModal('agregar')}>
                         <img src={agregarBanco} width={60} />
                     </button>
-                    <button onClick={() => setTipoModal('editar')}>
+                    <button onClick={abrirModalElegir}>
                         <img src={editarBanco} width={60} />
                     </button>
                 </Header>
@@ -70,16 +85,26 @@ export default function ListaDeBancos() {
                         }}
                     />
                 )}
+
                 {tipoModal === 'editar' && (
                     <ModalElegirCuenta
                         onClose={() => setTipoModal(null)}
-                        onContinuar={() => setTipoModal('editarBanco')}
+                        onContinuar={handleContinuar}   // pasa la cuenta al padre
                     />
                 )}
+
                 {tipoModal === 'editarBanco' && (
-                    <ModalEditarBanco onClose={() => setTipoModal(null)} />
+                    <ModalEditarBanco
+                        cuenta={cuentaSeleccionada}
+                        onClose={handleCerrarEditar}
+                        onCuentaActualizada={async () => {
+                            await fetchCuentas();      // recarga lista actualizada
+                            setTipoModal(null);        // cierra modal
+                        }}
+                    />
                 )}
+
             </main>
         </div>
-    )
-}  
+    );
+}
