@@ -21,6 +21,7 @@ export default function ModalEditarBanco({ cuenta, onClose, onCuentaActualizada 
       .then(data => setBancos(data))
       .catch(err => console.error('Fetch bancos error:', err));
   }, []);
+  
 
   // Inicializa formData cuando cambia la cuenta seleccionada
   useEffect(() => {
@@ -54,6 +55,7 @@ export default function ModalEditarBanco({ cuenta, onClose, onCuentaActualizada 
       payload.append('nombre', formData.nombre);
       payload.append('tCuenta', formData.tipoCuenta);
       payload.append('bancoId', formData.bancoId);
+
 
       const res = await fetch(
         `https://localhost:7149/api/Cuenta/${cuenta.idCuenta}`,
@@ -126,9 +128,11 @@ export default function ModalEditarBanco({ cuenta, onClose, onCuentaActualizada 
             value={formData.bancoId}
             onChange={handleChange}
           >
-            <option key="" value="">Seleccione banco...</option>
+            <option key="default-banco" value="">
+              Seleccione banco…
+            </option>
             {bancos.map(b => (
-              <option key={b.idBanco} value={b.idBanco}>
+              <option key={b.idBancos} value={b.idBancos}>
                 {b.nombre}
               </option>
             ))}
