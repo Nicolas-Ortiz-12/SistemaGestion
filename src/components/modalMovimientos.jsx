@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from "../components/modalMovimientos.module.css";
 
-export default function ModalDynamicFields({ isOpen, onClose }) {
+export default function modalMovimientos({ isOpen, onClose }) {
     const [selected, setSelected] = useState('');
 
     const handleSelectChange = (e) => {

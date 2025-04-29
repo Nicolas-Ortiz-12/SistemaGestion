@@ -1,105 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import Pagination from "../components/pagination";
-import styles from "./ordenDepago.module.css";
-
-const facturas = [
-    { fecha: '12-04-2024', nro: '001.001.000011', total: '750.000', saldo: '0', aplica: '750.000' },
-    { fecha: '12-04-2024', nro: '001.001.000011', total: '690.000', saldo: '0', aplica: '690.000' },
-    { fecha: '22-05-2024', nro: '001.001.000012', total: '254.256', saldo: '0', aplica: '254.256' },
-    { fecha: '15-03-2024', nro: '001.001.000013', total: '789.245', saldo: '0', aplica: '789.245' },
-    { fecha: '17-06-2024', nro: '001.001.000014', total: '1.000.000', saldo: '0', aplica: '1.000.000' },
-    { fecha: '11-08-2024', nro: '001.001.000015', total: '452.358', saldo: '0', aplica: '452.358' },
-    { fecha: '27-09-2024', nro: '001.001.000016', total: '985.125', saldo: '0', aplica: '985.125' },
-    { fecha: '01-10-2024', nro: '001.001.000017', total: '500.000', saldo: '0', aplica: '500.000' },
-    { fecha: '05-11-2024', nro: '001.001.000018', total: '1.250.000', saldo: '0', aplica: '1.250.000' },
-    { fecha: '25-12-2024', nro: '001.001.000019', total: '1.500.000', saldo: '0', aplica: '1.500.000' }
-];
-
-const proveedores = [
-    {
-        nombre: "Distribuidora Horeca",
-        ruc: "5896759-8",
-        actividad: "Alimentos y bebidas",
-        telefono: "+595985102897",
-        email: "contacto@horecadist.com",
-    },
-    {
-        nombre: "Importadora Martínez",
-        ruc: "1548796-3",
-        actividad: "Importación de tecnología",
-        telefono: "+595971456789",
-        email: "ventas@importmartinez.com",
-    },
-    {
-        nombre: "AgroPar S.A.",
-        ruc: "4785962-5",
-        actividad: "Agroquímicos",
-        telefono: "+595981332211",
-        email: "info@agropar.com.py",
-    },
-    {
-        nombre: "Construland",
-        ruc: "3012547-1",
-        actividad: "Materiales de construcción",
-        telefono: "+595983112233",
-        email: "pedidos@construland.com",
-    },
-    {
-        nombre: "Eco Print",
-        ruc: "1247859-9",
-        actividad: "Impresiones y papelería",
-        telefono: "+595991998877",
-        email: "eco@printpy.com",
-    },
-    {
-        nombre: "Global Repuestos",
-        ruc: "8547962-6",
-        actividad: "Repuestos de vehículos",
-        telefono: "+595981223344",
-        email: "contacto@globalrepuestos.com",
-    },
-    {
-        nombre: "Farmacenter",
-        ruc: "3054179-0",
-        actividad: "Distribución farmacéutica",
-        telefono: "+595985112200",
-        email: "ventas@farmacenter.com",
-    },
-    {
-        nombre: "CleanUp S.A.",
-        ruc: "7765412-4",
-        actividad: "Productos de limpieza",
-        telefono: "+595982765432",
-        email: "soporte@cleanuppsa.com",
-    },
-    {
-        nombre: "Distribuciones Frutales",
-        ruc: "1592634-2",
-        actividad: "Frutas y verduras",
-        telefono: "+595980456789",
-        email: "frutas@distribuciones.com",
-    },
-    {
-        nombre: "Eléctrica Zeta",
-        ruc: "2014579-1",
-        actividad: "Materiales eléctricos",
-        telefono: "+595986123456",
-        email: "ventas@zetaelectric.com",
-    },
-];
-
+import styles from "./ordenDePago.module.css";
 
 export default function OrdenDePago() {
     const [currentPage, setCurrentPage] = useState(1);
-    const navigate = useNavigate();
+    const [proveedores, setProveedores] = useState([]);
+    const [facturas, setFacturas] = useState([]);
     const [selectedIndices, setSelectedIndices] = useState([]);
+    const navigate = useNavigate();
 
     const itemsPerPage = 10;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentFacturas = facturas.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(facturas.length / itemsPerPage);
+
+    useEffect(() => {
+        // Obtener proveedores desde el backend
+        fetch('https://localhost:7149/api/Proveedores')
+            .then(res => res.json())
+            .then(data => setProveedores(data))
+            .catch(err => {
+                console.error("Error cargando proveedores:", err);
+                setProveedores([]);
+            });
+
+        // Obtener facturas desde el backend
+        fetch('https://localhost:7149/api/Factura')
+            .then(res => res.json())
+            .then(data => setFacturas(data))
+            .catch(err => {
+                console.error("Error cargando facturas:", err);
+                setFacturas([]);
+            });
+    }, []);
 
     const handleCheckboxChange = (globalIndex) => {
         setSelectedIndices(prev => {
@@ -120,7 +55,6 @@ export default function OrdenDePago() {
             <main className={styles.main}>
                 <Header title="Orden de Pago" />
                 <form className={styles.form}>
-                    {/* Filtros de búsqueda */}
                     <div className={styles.inputDiv}>
                         <label>Proveedor:</label>
                         <input list="proveedores" className={styles.input} />
@@ -141,17 +75,18 @@ export default function OrdenDePago() {
                     <button type="submit" className={styles.boton}>Buscar</button>
                 </form>
 
-
                 <h2 className={styles.texto}>Facturas Pendientes a Pago</h2>
                 <table className={styles.table}>
                     <thead>
                         <tr>
+                            <th>Nombre</th>
                             <th>Fecha</th>
                             <th>Nro.</th>
                             <th>Total</th>
                             <th>Saldo</th>
                             <th>Aplica</th>
                             <th>Acción</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -159,9 +94,10 @@ export default function OrdenDePago() {
                             const globalIndex = startIndex + i;
                             const checked = selectedIndices.includes(globalIndex);
                             return (
-                                <tr key={globalIndex}>
-                                    <td>{fac.fecha}</td>
-                                    <td>{fac.nro}</td>
+                                <tr key={fac.id || globalIndex}>
+                                    <td>{fac.proveedor.nombre}</td>
+                                    <td>{fac.fecha_exp}</td>
+                                    <td>{fac.nro_factura}</td>
                                     <td>{fac.total}</td>
                                     <td>{fac.saldo}</td>
                                     <td>{fac.aplica}</td>
