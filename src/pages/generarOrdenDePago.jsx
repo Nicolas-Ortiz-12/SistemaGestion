@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/header';
-import styles from '../pages/generarOrdenDepago.module.css';
+import styles from '../pages/generarOrdenDePago.module.css';
 
 export default function GenerarOrdenDePago() {
     const location = useLocation();
     const navigate = useNavigate();
     const facturas = location.state?.facturas || [];
+    const proveedorInicial = location.state?.proveedor || '';
 
-    // Encabezado
-    const [proveedor, setProveedor] = useState('');
+    const [proveedor, setProveedor] = useState(proveedorInicial);
     const [nroPago, setNroPago] = useState('');
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
     const [importeTotal, setImporteTotal] = useState(0);
 
-    // Modal y pagos
     const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState(''); // 'transferencia' | 'cheque'
+    const [modalType, setModalType] = useState('');
     const [modalFields, setModalFields] = useState({
         fechaEmision: new Date().toISOString().split('T')[0],
         nroReferencia: '',
@@ -30,13 +29,28 @@ export default function GenerarOrdenDePago() {
     });
     const [pagos, setPagos] = useState([]);
 
+    // Calcular importe total de facturas
     useEffect(() => {
-        const total = facturas.reduce((sum, f) => {
-            const num = parseInt(f.aplica.replace(/\./g, ''), 10) || 0;
-            return sum + num;
-        }, 0);
+        const total = facturas.reduce((sum, f) => sum + f.aplica, 0);
         setImporteTotal(total);
     }, [facturas]);
+
+    // Cargar pagos ya guardados (si se edita)
+    useEffect(() => {
+        fetchPagos();
+    }, []);
+
+    const fetchPagos = async () => {
+        try {
+            const res = await fetch('https://localhost:7149/api/OrdenDePago');
+            if (!res.ok) throw new Error('Error al obtener pagos');
+            const data = await res.json();
+            setPagos(data);
+        } catch (err) {
+            console.error(err);
+            alert('No se pudieron cargar los pagos.');
+        }
+    };
 
     const formatNumber = num =>
         num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -67,17 +81,68 @@ export default function GenerarOrdenDePago() {
         }));
     };
 
-    const savePago = () => {
-        const pago = {
+    // Guarda pago en BD y en estado
+    const savePago = async () => {
+        const pagoObj = {
             fecha: modalFields.fechaEmision,
             tipo: modalType === 'transferencia' ? 'Transferencia' : 'Cheque',
             cuenta: modalType === 'transferencia' ? modalFields.cuentaDestino : modalFields.banco,
-            monto: modalFields.monto,
+            monto: parseFloat(modalFields.monto),
             referencia: modalType === 'transferencia' ? modalFields.numeroTransferencia : modalFields.numeroCheque,
             concepto: modalFields.concepto
         };
-        setPagos(prev => [...prev, pago]);
-        setShowModal(false);
+        try {
+            const res = await fetch('https://localhost:7149/api/OrdenDePago', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pagoObj)
+            });
+            if (!res.ok) throw new Error('Error al guardar pago');
+            const newPago = await res.json();
+            setPagos(prev => [...prev, newPago]);
+            closeModal();
+        } catch (err) {
+            console.error(err);
+            alert('No se pudo guardar el pago.');
+        }
+    };
+
+    // Eliminar pago de BD y estado
+    const deletePago = async id => {
+        try {
+            const res = await fetch(`/api/pagos/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Error al eliminar pago');
+            setPagos(prev => prev.filter(p => p.id !== id));
+        } catch (err) {
+            console.error(err);
+            alert('No se pudo eliminar el pago.');
+        }
+    };
+
+    // Generar orden y guardar en BD
+    const generarOrden = async () => {
+        const ordenObj = {
+            proveedor,
+            nroPago,
+            fecha,
+            importeTotal,
+            facturas,
+            pagos
+        };
+        try {
+            const res = await fetch('/api/ordenes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ordenObj)
+            });
+            if (!res.ok) throw new Error('Error al generar orden');
+            const orden = await res.json();
+            alert(`Orden ${orden.id} generada correctamente.`);
+            navigate(`/ordenes/${orden.id}`);
+        } catch (err) {
+            console.error(err);
+            alert('No se pudo generar la orden.');
+        }
     };
 
     return (
@@ -85,11 +150,10 @@ export default function GenerarOrdenDePago() {
             <main className={styles.main}>
                 <Header title="Detalle Orden De Pago" />
 
-                {/* Encabezado */}
                 <form className={styles.formHeader} onSubmit={e => e.preventDefault()}>
                     <div className={styles.inputGroup}>
                         <label>Proveedor</label>
-                        <input value={proveedor} onChange={e => setProveedor(e.target.value)} />
+                        <input value={proveedor} readOnly />
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Nro. Pago</label>
@@ -105,7 +169,6 @@ export default function GenerarOrdenDePago() {
                     </div>
                 </form>
 
-                {/* Facturas seleccionadas */}
                 <h2 className={styles.sectionTitle}>Facturas A Pagar</h2>
                 <table className={styles.table}>
                     <thead>
@@ -120,17 +183,16 @@ export default function GenerarOrdenDePago() {
                     <tbody>
                         {facturas.map((f, idx) => (
                             <tr key={idx}>
-                                <td>{f.fecha}</td>
-                                <td>{f.nro}</td>
-                                <td>{f.total}</td>
-                                <td>{f.saldo}</td>
-                                <td>{f.aplica}</td>
+                                <td>{f.fecha_exp}</td>
+                                <td>{f.nro_factura}</td>
+                                <td>{formatNumber(f.total)}</td>
+                                <td>{formatNumber(f.saldo)}</td>
+                                <td>{formatNumber(f.aplica)}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
 
-                {/* Método de pago */}
                 <div className={styles.metodoContainer}>
                     <h2>Método De Pago</h2>
                     <button type="button" className={styles.btnTransferencia} onClick={() => openModal('transferencia')}>
@@ -164,19 +226,11 @@ export default function GenerarOrdenDePago() {
                                     <>
                                         <div className={styles.formRow}>
                                             <label>Nro. Referencia:</label>
-                                            <input
-                                                name="nroReferencia"
-                                                value={modalFields.nroReferencia}
-                                                onChange={handleFieldChange}
-                                            />
+                                            <input name="nroReferencia" value={modalFields.nroReferencia} onChange={handleFieldChange} />
                                         </div>
                                         <div className={styles.formRow}>
                                             <label>Nro. Transferencia:</label>
-                                            <input
-                                                name="numeroTransferencia"
-                                                value={modalFields.numeroTransferencia}
-                                                onChange={handleFieldChange}
-                                            />
+                                            <input name="numeroTransferencia" value={modalFields.numeroTransferencia} onChange={handleFieldChange} />
                                             <label className={styles.checkboxGroup}>
                                                 <input
                                                     type="checkbox"
@@ -192,23 +246,19 @@ export default function GenerarOrdenDePago() {
                                             <input name="monto" value={modalFields.monto} onChange={handleFieldChange} />
                                         </div>
                                         <div className={styles.formRow}>
-                                            <label>Cuenta de Destino:</label>
+                                            <label>Cuenta Destino:</label>
                                             <input name="cuentaDestino" value={modalFields.cuentaDestino} onChange={handleFieldChange} />
                                         </div>
                                     </>
                                 ) : (
                                     <>
                                         <div className={styles.formRow}>
-                                            <label>Banco Emisor:</label>
+                                            <label>Banco:</label>
                                             <input name="banco" value={modalFields.banco} onChange={handleFieldChange} />
                                         </div>
                                         <div className={styles.formRow}>
                                             <label>Nro. Cheque:</label>
                                             <input name="numeroCheque" value={modalFields.numeroCheque} onChange={handleFieldChange} />
-                                        </div>
-                                        <div className={styles.formRow}>
-                                            <label>Monto:</label>
-                                            <input name="monto" value={modalFields.monto} onChange={handleFieldChange} />
                                         </div>
                                     </>
                                 )}
@@ -217,15 +267,15 @@ export default function GenerarOrdenDePago() {
                                     <label>Concepto:</label>
                                     <input name="concepto" value={modalFields.concepto} onChange={handleFieldChange} />
                                 </div>
-                            </div>
-                            <div className={styles.modalFooter}>
-                                <button className={styles.btnGuardar} onClick={savePago}>Guardar</button>
+
+                                <div className={styles.formRow}>
+                                    <button className={styles.btnGuardar} onClick={savePago}>Guardar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Tabla de pagos */}
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -237,16 +287,14 @@ export default function GenerarOrdenDePago() {
                         </tr>
                     </thead>
                     <tbody>
-                        {pagos.map((p, i) => (
-                            <tr key={i}>
+                        {pagos.map(p => (
+                            <tr key={p.id}>
                                 <td>{p.fecha}</td>
                                 <td>{p.tipo}</td>
                                 <td>{p.cuenta}</td>
                                 <td>{formatNumber(p.monto)}</td>
                                 <td>
-                                    <button onClick={() => setPagos(prev => prev.filter((_, idx) => idx !== i))}>
-                                        🗑️
-                                    </button>
+                                    <button onClick={() => deletePago(p.id)}>🗑️</button>
                                 </td>
                             </tr>
                         ))}
@@ -256,7 +304,7 @@ export default function GenerarOrdenDePago() {
                 {/* Acciones finales */}
                 <div className={styles.actions}>
                     <button className={styles.buttonVolver} onClick={() => navigate(-1)}>Volver</button>
-                    <button className={styles.buttonGenerar}>Generar Orden</button>
+                    <button className={styles.buttonGenerar} onClick={generarOrden}>Generar Orden</button>
                 </div>
             </main>
         </div>
