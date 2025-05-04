@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import styles from "../components/modalMovimientos.module.css";
+import styles from '../components/modalMovimientos.module.css';
 
-export default function modalMovimientos({ isOpen, onClose }) {
-    const [selected, setSelected] = useState('');
+export default function AgregarTransaccion({ isOpen, onClose }) {
+    const [tipoTransaccion, setTipoTransaccion] = useState('');
 
-    const handleSelectChange = (e) => {
-        setSelected(e.target.value);
+    const handleTipoChange = (e) => {
+        setTipoTransaccion(e.target.value);
     };
 
     if (!isOpen) return null;
@@ -13,50 +13,62 @@ export default function modalMovimientos({ isOpen, onClose }) {
     return (
         <div className={styles.overlay}>
             <div className={styles.modal}>
-                <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-                <h2>Selecciona una opción</h2>
-                <select value={selected} onChange={handleSelectChange} className={styles.select}>
-                    <option value="">-- Elige una opción --</option>
-                    <option value="opcion1">Opción 1</option>
-                    <option value="opcion2">Opción 2</option>
-                    <option value="opcion3">Opción 3</option>
-                </select>
-
-                {/* Campos dinámicos según la opción */}
-                {selected === 'opcion1' && (
-                    <div className={styles.fields}>
-                        <label>
-                            Campo A
-                            <input type="text" />
-                        </label>
-                        <label>
-                            Campo B
-                            <input type="text" />
-                        </label>
+                <div className={styles.header}>
+                    <h2>Agregar Transacción</h2>
+                </div>
+                <div className={styles.form}>
+                    <div className={styles.row}>
+                        <div className={styles.field}>
+                            <label>Tipo de transacción</label>
+                            <select
+                                value={tipoTransaccion}
+                                onChange={handleTipoChange}
+                                className={styles.select}
+                            >
+                                <option value="">Seleccione tipo de transacción</option>
+                                <option value="agregar">+ Agregar Transaccion</option>
+                            </select>
+                        </div>
+                        <div className={styles.field}>
+                            <label>Fecha</label>
+                            <input type="date" className={styles.input} />
+                        </div>
                     </div>
-                )}
 
-                {selected === 'opcion2' && (
-                    <div className={styles.fields}>
-                        <label>
-                            Campo C
-                            <input type="text" />
-                        </label>
+                    <div className={styles.row}>
+                        <div className={styles.field}>
+                            <label>Monto</label>
+                            <input type="number" placeholder="Ingrese el monto" className={styles.input} />
+                        </div>
+                        <div className={styles.field}>
+                            <label>Cuenta de destino</label>
+                            <input type="text" placeholder="Número de cuenta" className={styles.input} />
+                        </div>
                     </div>
-                )}
 
-                {selected === 'opcion3' && (
-                    <div className={styles.fields}>
-                        <label>
-                            Campo D
-                            <input type="text" />
-                        </label>
-                        <label>
-                            Campo E
-                            <input type="text" />
-                        </label>
+                    <div className={styles.row}>
+                        <div className={styles.field}>
+                            <label>Beneficiario</label>
+                            <input type="text" placeholder="Nombre del beneficiario" className={styles.input} />
+                        </div>
+                        <div className={styles.field}>
+                            <label>Concepto</label>
+                            <input type="text" placeholder="Ej. Pago de servicios" className={styles.input} />
+                        </div>
                     </div>
-                )}
+
+                    <div className={styles.row}>
+                        <div className={styles.field} style={{ width: "100%" }}>
+                            <label>Motivo</label>
+                            <input type="text" placeholder="Motivo de la transacción" className={styles.input} />
+                        </div>
+                    </div>
+
+                    <div className={styles.buttons}>
+                        <button className={styles.save}>Guardar</button>
+                        <button className={styles.close} onClick={onClose}>Cerrar</button>
+                    </div>
+                </div>
             </div>
         </div>
     );
