@@ -30,7 +30,7 @@ export default function Proveedores() {
                 return res.json();
             })
             .then(data => {
-                setCurrentPage(1); // 👈 Reinicia la página después de actualizar
+                setCurrentPage(1);
                 setProveedores(data);
             })
             .catch(error => console.error("Error:", error));

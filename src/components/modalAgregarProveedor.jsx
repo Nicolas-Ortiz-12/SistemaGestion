@@ -31,6 +31,7 @@ export default function ModalAgregarProveedor({ onClose, onSuccess }) {
       form.append('direccion', formData.direccion);
       form.append('actividad', formData.actividad);
 
+      
       const response = await fetch('https://localhost:7149/api/Proveedores', {
         method: 'POST',
         body: form
@@ -41,8 +42,8 @@ export default function ModalAgregarProveedor({ onClose, onSuccess }) {
         throw new Error(message || 'Error al guardar proveedor');
       }
 
-      onSuccess(); // 👈 Actualiza la lista
-      onClose();   // 👈 Cierra el modal
+      onSuccess(); 
+      onClose();   
     } catch (error) {
       console.error(error);
       alert('Error al agregar proveedor');

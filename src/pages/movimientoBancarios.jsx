@@ -1,24 +1,13 @@
-// src/pages/MovimientosBancarios.jsx
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from '../components/header'
 import agregarMovimientoImg from "../img/agregarMovimiento.png"
 import TabSelector from '../components/tab.jsx'
-import Pagination from '../components/pagination.jsx';
-import ModalMovimiento from "../components/modalMovimientos.jsx";
+import Pagination from '../components/pagination.jsx'
+import ModalMovimiento from "../components/modalMovimientos.jsx"
 import styles from '../pages/movimientosBancarios.module.css'
 
-
-const movimientosData = [
-    { referencia: 'Pago de Seguro contra Incendios', fecha: '24/03/20', debe: '', haber: '1.500.000', tipo: 'Cheque', estado: 'Emitido' },
-    { referencia: 'Alquiler de Salón de Eventos', fecha: '23/03/20', debe: '8.000.000', haber: '', tipo: 'Transferencia', estado: 'Emitido' },
-    { referencia: 'Pago de Obras en Planta Baja', fecha: '22/03/20', debe: '', haber: '2.800.000', tipo: 'Cheque', estado: 'Emitido' },
-    { referencia: 'Pago de Almuerzo de Empleados', fecha: '21/03/20', debe: '', haber: '300.000', tipo: 'Transferencia', estado: 'Emitido' },
-    { referencia: 'Pago de Reparación Inmobiliaria', fecha: '20/03/20', debe: '', haber: '500.000', tipo: 'Transferencia', estado: 'Emitido' },
-    { referencia: 'Cobro de Alquiler de Quincho', fecha: '19/03/20', debe: '1.400.000', haber: '', tipo: 'Transferencia', estado: 'Emitido' },
-    { referencia: 'Pago a Proveedor', fecha: '18/03/20', debe: '', haber: '1.300.000', tipo: 'Cheque', estado: 'Conciliado' },
-    { referencia: 'Compra de torta de cumpleaños', fecha: '17/03/20', debe: '', haber: '80.000', tipo: 'Transferencia', estado: 'Emitido' },
-]
+// Datos estáticos de conciliaciones (se mantiene igual)
 const conciliacionesData = [
     { referencia: '009', fechaEmision: '24/03/2024', fechaConciliacion: '', monto: '2.200.000' },
     { referencia: '008', fechaEmision: '23/03/2024', fechaConciliacion: '29/03/2024', monto: '1.000.000' },
@@ -27,62 +16,117 @@ const conciliacionesData = [
     { referencia: '005', fechaEmision: '20/03/2024', fechaConciliacion: '24/03/2024', monto: '1.540.000' },
     { referencia: '004', fechaEmision: '19/03/2024', fechaConciliacion: '22/03/2024', monto: '800.000' },
     { referencia: '003', fechaEmision: '18/03/2024', fechaConciliacion: '21/03/2024', monto: '150.000' },
-    { referencia: '002', fechaEmision: '17/03/2024', fechaConciliacion: '19/03/2024', monto: '950.000' },
-    { referencia: '009', fechaEmision: '24/03/2024', fechaConciliacion: '', monto: '2.200.000' },
-    { referencia: '008', fechaEmision: '23/03/2024', fechaConciliacion: '29/03/2024', monto: '1.000.000' },
-    { referencia: '007', fechaEmision: '22/03/2024', fechaConciliacion: '28/03/2024', monto: '2.800.000' },
-    { referencia: '006', fechaEmision: '21/03/2024', fechaConciliacion: '26/03/2024', monto: '3.000.000' },
-    { referencia: '005', fechaEmision: '20/03/2024', fechaConciliacion: '24/03/2024', monto: '1.540.000' },
-    { referencia: '004', fechaEmision: '19/03/2024', fechaConciliacion: '22/03/2024', monto: '800.000' },
-    { referencia: '003', fechaEmision: '18/03/2024', fechaConciliacion: '21/03/2024', monto: '150.000' },
-    { referencia: '002', fechaEmision: '17/03/2024', fechaConciliacion: '19/03/2024', monto: '950.000' },
+    { referencia: '002', fechaEmision: '17/03/2024', fechaConciliacion: '19/03/2024', monto: '950.000' }
 ]
 
 export default function MovimientosBancarios() {
     const { state } = useLocation()
     const navigate = useNavigate()
 
-    // pestaña activa: 'movimientos' | 'conciliaciones'
+    // Si no viene el banco, redirigimos
+    if (!state?.bank) {
+        useEffect(() => {
+            navigate('/listaDeBancos', { replace: true })
+        }, [state, navigate])
+        return null
+    }
+
+    // ---- Estados ----
+    // Cuenta completa (trae saldo)
+    const [cuenta, setCuenta] = useState({ saldo: 0 })
+    const [loadingCuenta, setLoadingCuenta] = useState(false)
+    const [errorCuenta, setErrorCuenta] = useState(null)
+
+    // Movimientos
+    const [movimientos, setMovimientos] = useState([])
+    const [loadingMov, setLoadingMov] = useState(false)
+    const [errorMov, setErrorMov] = useState(null)
+
+    // Paginación y pestañas
     const [activeTab, setActiveTab] = useState('movimientos')
-
-    // paginación
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPageMov = 8;
-    const itemsPerPageCon = 10;
+    const itemsPerPageMov = 5
+    const itemsPerPageCon = 10
 
-    // estados para formulario de conciliación
+    // Conciliaciones
     const [concFecha, setConcFecha] = useState(new Date().toISOString().slice(0, 10))
     const [concSaldoAnt, setConcSaldoAnt] = useState('')
     const [concSaldo2do, setConcSaldo2do] = useState('')
     const [concSaldoAct, setConcSaldoAct] = useState('')
 
+    // Modal de nuevo movimiento
+    const [isModalOpen, setModalOpen] = useState(false)
+
+    // ---- Helpers ----
+    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-ES')
+
+    // ---- Fetch de movimientos ----
+    const fetchMovimientos = async () => {
+        setLoadingMov(true)
+        setErrorMov(null)
+        try {
+            const resp = await fetch(`https://localhost:7149/api/Movimiento?cuentaId=${state.account.id}`)
+            if (!resp.ok) throw new Error('Error al cargar movimientos')
+            const data = await resp.json()
+            setMovimientos(data)
+        } catch (err) {
+            setErrorMov(err.message)
+        } finally {
+            setLoadingMov(false)
+        }
+    }
+
+    // ---- Fetch de cuenta (incl. saldo) ----
+    const fetchCuenta = async () => {
+        setLoadingCuenta(true)
+        setErrorCuenta(null)
+        try {
+            const resp = await fetch(`https://localhost:7149/api/Cuenta/${state.account.idCuenta}`)
+            if (!resp.ok) throw new Error('Error al cargar la cuenta')
+            const data = await resp.json()
+            setCuenta(data)
+        } catch (err) {
+            setErrorCuenta(err.message)
+        } finally {
+            setLoadingCuenta(false)
+        }
+    }
+
+    // ---- Effects ----
+    // Al cambiar de tab, recargar movimientos
     useEffect(() => {
-        if (!state?.bank) navigate('/listaDeBancos', { replace: true })
-    }, [state, navigate])
+        if (activeTab === 'movimientos') {
+            fetchMovimientos()
+        }
+    }, [activeTab, state.account.id])
 
-    if (!state?.bank) return null
+    // Al montar y cada vez que cambie idCuenta, recargar cuenta
+    useEffect(() => {
+        fetchCuenta()
+    }, [state.account.idCuenta])
 
-    // para movimientos
+    // ---- Manejo de nuevo movimiento ----
+    const handleSaveMovimiento = savedMov => {
+        // Insertar al inicio de la tabla
+        setMovimientos(prev => [savedMov, ...prev])
+        setCurrentPage(1)
+        // Refrescar saldo desde API
+        fetchCuenta()
+    }
+
+    // ---- Paginación ----
     const startMov = (currentPage - 1) * itemsPerPageMov
-    const pageMov = movimientosData.slice(startMov, startMov + itemsPerPageMov)
-    const totalPagesMov = Math.ceil(movimientosData.length / itemsPerPageMov);
+    const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
+    const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
 
-    // para conciliaciones
     const startCon = (currentPage - 1) * itemsPerPageCon
     const pageCon = conciliacionesData.slice(startCon, startCon + itemsPerPageCon)
-    const totalPagesCon = Math.ceil(conciliacionesData.length / itemsPerPageCon);
+    const totalPagesCon = Math.ceil(conciliacionesData.length / itemsPerPageCon)
 
-
-    const [isModalOpen, setModalOpen] = useState(false);
-
-    const name = state.bank.nombre;
-    const type = state.account.tCuenta;
-    const balance = state.account.saldo;
     return (
-
         <div className={styles.container}>
             <main className={styles.main}>
-                <Header title={`${name} – ${type}`}>
+                <Header title={`${state.bank.nombre} – ${state.account.tCuenta}`}>
                     <button onClick={() => setModalOpen(true)}>
                         <img src={agregarMovimientoImg} width={70} />
                     </button>
@@ -91,14 +135,16 @@ export default function MovimientosBancarios() {
                 <ModalMovimiento
                     isOpen={isModalOpen}
                     onClose={() => setModalOpen(false)}
+                    accountId={state.account.idCuenta}
+                    onSave={handleSaveMovimiento}
                 />
 
-
-                {/* pestañas */}
                 <div className={styles.tabs}>
-                    <TabSelector activeTab={activeTab} onChange={setActiveTab} />
+                    <TabSelector
+                        activeTab={activeTab}
+                        onChange={tab => { setActiveTab(tab); setCurrentPage(1) }}
+                    />
                 </div>
-
 
                 {activeTab === 'movimientos' && (
                     <>
@@ -107,47 +153,58 @@ export default function MovimientosBancarios() {
                                 SALDO TOTAL<br />DE LA CUENTA
                             </div>
                             <div className={styles.balanceAmount}>
-                                {balance.toLocaleString('es-PY')}₲
+                                {loadingCuenta
+                                    ? 'Cargando...'
+                                    : errorCuenta
+                                        ? '—'
+                                        : cuenta.saldo.toLocaleString('es-PY') + '₲'
+                                }
                             </div>
                         </div>
 
-                        <h2 className={styles.sectionTitle}>
-                            Últimos Movimientos Bancarios
-                        </h2>
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>REFERENCIA</th>
-                                    <th>FECHA</th>
-                                    <th>DEBE</th>
-                                    <th>HABER</th>
-                                    <th>TIPO</th>
-                                    <th>ESTADO</th>
-                                    <th>ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pageMov.map((m, i) => (
-                                    <tr key={i}>
-                                        <td>{m.referencia}</td>
-                                        <td>{m.fecha}</td>
-                                        <td>{m.debe}</td>
-                                        <td>{m.haber}</td>
-                                        <td>{m.tipo}</td>
-                                        <td>{m.estado}</td>
-                                        <td>
-                                            <button className={styles.actionBtn}>📋</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <h2 className={styles.sectionTitle}>Últimos Movimientos Bancarios</h2>
 
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPagesMov}
-                            onPageChange={setCurrentPage}
-                        />
+                        {loadingMov && <p>Cargando movimientos...</p>}
+                        {errorMov && <p className={styles.error}>{errorMov}</p>}
+
+                        {!loadingMov && !errorMov && (
+                            <>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>Concepto</th>
+                                            <th>Fecha</th>
+                                            <th>Debe</th>
+                                            <th>Haber</th>
+                                            <th>Transacción</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {pageMov.map((m, i) => (
+                                            <tr key={i}>
+                                                <td>{m.concepto}</td>
+                                                <td>{formatDate(m.fecha)}</td>
+                                                <td>{m.transaccion.tipoMov === 'D' ? m.monto.toLocaleString('es-PY') : ''}</td>
+                                                <td>{m.transaccion.tipoMov === 'C' ? m.monto.toLocaleString('es-PY') : ''}</td>
+                                                <td>{m.transaccion.nombre.trim()}</td>
+                                                <td>{m.estado}</td>
+                                                <td>
+                                                    <button className={styles.actionBtn}>📋</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPagesMov}
+                                    onPageChange={setCurrentPage}
+                                />
+                            </>
+                        )}
                     </>
                 )}
 
@@ -207,9 +264,7 @@ export default function MovimientosBancarios() {
                                 {pageCon.map((c, i) => (
                                     <tr key={i}>
                                         <td>{c.referencia}</td>
-                                        <td>
-                                            <input type="checkbox" />
-                                        </td>
+                                        <td><input type="checkbox" /></td>
                                         <td>{c.fechaEmision}</td>
                                         <td>{c.fechaConciliacion || '—'}</td>
                                         <td>{c.monto}</td>
@@ -226,6 +281,6 @@ export default function MovimientosBancarios() {
                     </>
                 )}
             </main>
-        </div >
+        </div>
     )
 }
