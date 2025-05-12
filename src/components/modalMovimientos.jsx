@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../components/modalMovimientos.module.css';
 
-
-
 export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
     const [tipoTransaccion, setTipoTransaccion] = useState('');
     const [tiposTransaccion, setTiposTransaccion] = useState([]);
-    const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10));
+    const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10)); // <--- FECHA HOY
     const [monto, setMonto] = useState('');
     const [cuentaDestino, setCuentaDestino] = useState('');
     const [beneficiario, setBeneficiario] = useState('');
@@ -28,23 +26,25 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
     }, []);
 
     const handleSave = async () => {
-        // Construir FormData para [FromForm]
+        const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
+        const nombreTipo = seleccion?.nombre;
+        const estado = nombreTipo === 'Emisión de cheque' ? 'Pendiente' : 'Activo';
+
         const formData = new FormData();
         formData.append('Monto', monto);
         formData.append('CtaDestino', cuentaDestino || 0);
         formData.append('Beneficiario', beneficiario || null);
         formData.append('Concepto', concepto);
         formData.append('Motivo', motivo);
-        formData.append('Estado', 'Activo');
+        formData.append('Estado', estado);
         formData.append('IdCuenta', accountId);
         formData.append('IdTran', tipoTransaccion);
-
-        
+        formData.append('Fecha', fecha); // <-- Agregado explícitamente si la API lo requiere
 
         try {
             const resp = await fetch('https://localhost:7149/api/Movimiento', {
                 method: 'POST',
-                body: formData  // browser auto-sets multipart/form-data
+                body: formData
             });
             if (!resp.ok) throw new Error(`Error ${resp.status}: No se guardó el movimiento`);
             console.log('Movimiento guardado correctamente');
@@ -53,7 +53,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
             console.error('Error al guardar Movimiento:', error);
         }
     };
-    
+
     if (!isOpen) return null;
 
     const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
@@ -66,7 +66,6 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <h2>Agregar Movimiento</h2>
-                    
                 </div>
                 <div className={styles.form}>
                     {/* Tipo de transacción */}
@@ -79,6 +78,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                                 className={styles.select}
                             >
                                 <option value="">Seleccione tipo de transacción</option>
+                                <option value="agregarT">Agregar transaccion...</option>
                                 {tiposTransaccion.map(t => (
                                     <option key={t.idTran} value={String(t.idTran)}>
                                         {t.nombre}
@@ -127,7 +127,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                         </div>
                     )}
 
-                    {/* Beneficiario */}    
+                    {/* Beneficiario */}
                     {showBeneficiario && (
                         <div className={styles.row}>
                             <div className={styles.field}>
@@ -171,6 +171,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                         </div>
                     </div>
 
+                    {/* Botones */}
                     <div className={styles.buttons}>
                         <button className={styles.save} onClick={handleSave}>
                             Guardar

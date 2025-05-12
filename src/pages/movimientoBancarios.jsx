@@ -7,62 +7,49 @@ import Pagination from '../components/pagination.jsx'
 import ModalMovimiento from "../components/modalMovimientos.jsx"
 import styles from '../pages/movimientosBancarios.module.css'
 
-// Datos estáticos de conciliaciones (se mantiene igual)
-const conciliacionesData = [
-    { referencia: '009', fechaEmision: '24/03/2024', fechaConciliacion: '', monto: '2.200.000' },
-    { referencia: '008', fechaEmision: '23/03/2024', fechaConciliacion: '29/03/2024', monto: '1.000.000' },
-    { referencia: '007', fechaEmision: '22/03/2024', fechaConciliacion: '28/03/2024', monto: '2.800.000' },
-    { referencia: '006', fechaEmision: '21/03/2024', fechaConciliacion: '26/03/2024', monto: '3.000.000' },
-    { referencia: '005', fechaEmision: '20/03/2024', fechaConciliacion: '24/03/2024', monto: '1.540.000' },
-    { referencia: '004', fechaEmision: '19/03/2024', fechaConciliacion: '22/03/2024', monto: '800.000' },
-    { referencia: '003', fechaEmision: '18/03/2024', fechaConciliacion: '21/03/2024', monto: '150.000' },
-    { referencia: '002', fechaEmision: '17/03/2024', fechaConciliacion: '19/03/2024', monto: '950.000' }
-]
-
 export default function MovimientosBancarios() {
     const { state } = useLocation()
     const navigate = useNavigate()
 
-    // Si no viene el banco, redirigimos
+    // Redirigir si no hay información del banco
     if (!state?.bank) {
         useEffect(() => {
-            navigate('/listaDeBancos', { replace: true })
+            navigate('/listaDeBancos')
         }, [state, navigate])
         return null
     }
 
-    // ---- Estados ----
-    // Cuenta completa (trae saldo)
+    // Estados de cuenta y movimientos
     const [cuenta, setCuenta] = useState({ saldo: 0 })
-    const [loadingCuenta, setLoadingCuenta] = useState(false)
     const [errorCuenta, setErrorCuenta] = useState(null)
-
-    // Movimientos
     const [movimientos, setMovimientos] = useState([])
-    const [loadingMov, setLoadingMov] = useState(false)
     const [errorMov, setErrorMov] = useState(null)
 
-    // Paginación y pestañas
+    // Estados de conciliaciones
+    const [conciliaciones, setConciliaciones] = useState([])
+    const [errorConc, setErrorConc] = useState(null)
+
+    // Tabs y paginación
     const [activeTab, setActiveTab] = useState('movimientos')
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPageMov = 5
     const itemsPerPageCon = 10
 
-    // Conciliaciones
+    // Formulario de conciliación
     const [concFecha, setConcFecha] = useState(new Date().toISOString().slice(0, 10))
     const [concSaldoAnt, setConcSaldoAnt] = useState('')
     const [concSaldo2do, setConcSaldo2do] = useState('')
-    const [concSaldoAct, setConcSaldoAct] = useState('')
+    const [concSaldoAct, setConcSaldoAct] = useState(0)
+    const [selectedConcMovs, setSelectedConcMovs] = useState([])
 
-    // Modal de nuevo movimiento
+    // Modal para agregar movimiento
     const [isModalOpen, setModalOpen] = useState(false)
 
-    // ---- Helpers ----
+    // Formatea fecha ISO a legible
     const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-ES')
 
-    // ---- Fetch de movimientos ----
+    // Fetch Movimientos
     const fetchMovimientos = async () => {
-        setLoadingMov(true)
         setErrorMov(null)
         try {
             const resp = await fetch(`https://localhost:7149/api/Movimiento?cuentaId=${state.account.id}`)
@@ -71,14 +58,12 @@ export default function MovimientosBancarios() {
             setMovimientos(data)
         } catch (err) {
             setErrorMov(err.message)
-        } finally {
-            setLoadingMov(false)
         }
     }
+console.log(concSaldo2do)
 
-    // ---- Fetch de cuenta (incl. saldo) ----
+    // Fetch Cuenta
     const fetchCuenta = async () => {
-        setLoadingCuenta(true)
         setErrorCuenta(null)
         try {
             const resp = await fetch(`https://localhost:7149/api/Cuenta/${state.account.idCuenta}`)
@@ -87,48 +72,95 @@ export default function MovimientosBancarios() {
             setCuenta(data)
         } catch (err) {
             setErrorCuenta(err.message)
-        } finally {
-            setLoadingCuenta(false)
         }
     }
 
-    // ---- Effects ----
-    // Al cambiar de tab, recargar movimientos
-    useEffect(() => {
-        if (activeTab === 'movimientos') {
-            fetchMovimientos()
+    // Fetch Conciliaciones Pendientes
+    const fetchConciliaciones = async () => {
+        setErrorConc(null)
+        try {
+            const resp = await fetch(`https://localhost:7149/api/Movimiento/pendientes?cuentaId=${state.account.id}`)
+            if (!resp.ok) throw new Error('Error al cargar conciliaciones pendientes')
+            const data = await resp.json()
+            setConciliaciones(data.map(c => ({ ...c, estado: 'Pendiente' })))
+        } catch (err) {
+            setErrorConc(err.message)
         }
+    }
+
+    // Efectos de carga
+    useEffect(() => {
+        if (activeTab === 'movimientos') fetchMovimientos()
     }, [activeTab, state.account.id])
 
-    // Al montar y cada vez que cambie idCuenta, recargar cuenta
     useEffect(() => {
         fetchCuenta()
     }, [state.account.idCuenta])
 
-    // ---- Manejo de nuevo movimiento ----
+    useEffect(() => {
+        if (activeTab === 'conciliaciones') fetchConciliaciones()
+    }, [activeTab, state.account.id])
+
+    // Actualiza saldo actual al cambiar selección
+    useEffect(() => {
+        const sum = selectedConcMovs.reduce((acc, mov) => acc + mov.monto, 0)
+        setConcSaldoAct(sum)
+    }, [selectedConcMovs])
+
+    // Maneja selección de movimiento para conciliación
+    const handleSelectConc = (mov, checked) => {
+        if (checked) {
+            setSelectedConcMovs(prev => [...prev, mov])
+        } else {
+            setSelectedConcMovs(prev => prev.filter(m => m.idMovi !== mov.idMovi))
+        }
+    }
+
+    // Handler de Conciliación
+    const handleConciliar = () => {
+        const saldo2 = parseFloat(concSaldo2do)
+        if (isNaN(saldo2)) {
+            alert('Ingrese un valor numérico en Saldo 2do Edo. Cta.')
+            return
+        }
+        if (saldo2 === concSaldoAct) {
+            setConciliaciones(prev => prev.map(c =>
+                selectedConcMovs.some(m => m.idMovi === c.idMovi)
+                    ? { ...c, estado: 'Conciliado', fechaConciliacion: concFecha }
+                    : c
+            ))
+            setSelectedConcMovs([])
+            setConcSaldoAnt('')
+            setConcSaldo2do('')
+            setConcSaldoAct(0)
+        } else {
+            alert('El Saldo 2do Edo. Cta debe ser igual al Saldo Actual para conciliar')
+        }
+    }
+
+    // Manejo de guardado de nuevo movimiento
     const handleSaveMovimiento = savedMov => {
-        // Insertar al inicio de la tabla
         setMovimientos(prev => [savedMov, ...prev])
         setCurrentPage(1)
-        // Refrescar saldo desde API
         fetchCuenta()
     }
 
-    // ---- Paginación ----
+    // Paginación Movimientos
     const startMov = (currentPage - 1) * itemsPerPageMov
     const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
     const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
 
+    // Paginación Conciliaciones
     const startCon = (currentPage - 1) * itemsPerPageCon
-    const pageCon = conciliacionesData.slice(startCon, startCon + itemsPerPageCon)
-    const totalPagesCon = Math.ceil(conciliacionesData.length / itemsPerPageCon)
+    const pageCon = conciliaciones.slice(startCon, startCon + itemsPerPageCon)
+    const totalPagesCon = Math.ceil(conciliaciones.length / itemsPerPageCon)
 
     return (
         <div className={styles.container}>
             <main className={styles.main}>
                 <Header title={`${state.bank.nombre} – ${state.account.tCuenta}`}>
                     <button onClick={() => setModalOpen(true)}>
-                        <img src={agregarMovimientoImg} width={70} />
+                        <img src={agregarMovimientoImg} width={70} alt="Agregar movimiento" />
                     </button>
                 </Header>
 
@@ -147,27 +179,21 @@ export default function MovimientosBancarios() {
                 </div>
 
                 {activeTab === 'movimientos' && (
-                    <>
+                    <> {/* Movimientos bancarios */}
                         <div className={styles.balanceCard}>
                             <div className={styles.balanceTitle}>
                                 SALDO TOTAL<br />DE LA CUENTA
                             </div>
                             <div className={styles.balanceAmount}>
-                                {loadingCuenta
-                                    ? 'Cargando...'
-                                    : errorCuenta
-                                        ? '—'
-                                        : cuenta.saldo.toLocaleString('es-PY') + '₲'
-                                }
+                                {errorCuenta ? '—' : state.account.saldo.toLocaleString('es-PY') + '₲'}
                             </div>
                         </div>
 
                         <h2 className={styles.sectionTitle}>Últimos Movimientos Bancarios</h2>
 
-                        {loadingMov && <p>Cargando movimientos...</p>}
                         {errorMov && <p className={styles.error}>{errorMov}</p>}
 
-                        {!loadingMov && !errorMov && (
+                        {!errorMov && (
                             <>
                                 <table className={styles.table}>
                                     <thead>
@@ -209,7 +235,7 @@ export default function MovimientosBancarios() {
                 )}
 
                 {activeTab === 'conciliaciones' && (
-                    <>
+                    <> {/* Conciliaciones */}
                         <div className={styles.conciliacionForm}>
                             <div>
                                 <label>Fecha:</label>
@@ -241,43 +267,58 @@ export default function MovimientosBancarios() {
                                 <label>Saldo Actual:</label>
                                 <input
                                     type="text"
-                                    value={concSaldoAct}
-                                    onChange={e => setConcSaldoAct(e.target.value)}
+                                    value={concSaldoAct.toLocaleString('es-PY')}
+                                    readOnly
                                     placeholder="0.00"
                                 />
                             </div>
-                            <button>Conciliar</button>
+                            <button onClick={handleConciliar}>Conciliar</button>
                         </div>
 
-                        <h2 className={styles.sectionTitle}>Listado de Conciliaciones</h2>
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>REFERENCIA</th>
-                                    <th></th>
-                                    <th>FECHA EMISIÓN</th>
-                                    <th>FECHA CONCILIACIÓN</th>
-                                    <th>MONTO</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pageCon.map((c, i) => (
-                                    <tr key={i}>
-                                        <td>{c.referencia}</td>
-                                        <td><input type="checkbox" /></td>
-                                        <td>{c.fechaEmision}</td>
-                                        <td>{c.fechaConciliacion || '—'}</td>
-                                        <td>{c.monto}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <h2 className={styles.sectionTitle}>Pendientes de Conciliación</h2>
 
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPagesCon}
-                            onPageChange={setCurrentPage}
-                        />
+                        {errorConc && <p className={styles.error}>{errorConc}</p>}
+
+                        {!errorConc && (
+                            <>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>REFERENCIA</th>
+                                            <th></th>
+                                            <th>FECHA EMISIÓN</th>
+                                            <th>FECHA CONCILIACIÓN</th>
+                                            <th>MONTO</th>
+                                            <th>ESTADO</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {pageCon.map((c, i) => (
+                                            <tr key={i}>
+                                                <td>{c.idMovi}</td>
+                                                <td>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedConcMovs.some(m => m.idMovi === c.idMovi)}
+                                                        onChange={e => handleSelectConc(c, e.target.checked)}
+                                                    />
+                                                </td>
+                                                <td>{formatDate(c.fecha)}</td>
+                                                <td>{c.fechaConciliacion || '—'}</td>
+                                                <td>{c.monto.toLocaleString('es-PY')}</td>
+                                                <td>{c.estado}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPagesCon}
+                                    onPageChange={setCurrentPage}
+                                />
+                            </>
+                        )}
                     </>
                 )}
             </main>
