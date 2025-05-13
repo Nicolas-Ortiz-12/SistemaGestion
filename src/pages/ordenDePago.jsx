@@ -139,8 +139,7 @@ export default function OrdenDePago() {
                             <th>Nro.</th>
                             <th>Total</th>
                             <th>Saldo</th>
-                            <th>Aplica</th>
-                            <th>Acción</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,7 +153,7 @@ export default function OrdenDePago() {
                                     <td>{fac.nro_factura}</td>
                                     <td>{fac.total}</td>
                                     <td>{fac.saldo}</td>
-                                    <td>{fac.aplica}</td>
+                                    
                                     <td>
                                         <input
                                             type="checkbox"

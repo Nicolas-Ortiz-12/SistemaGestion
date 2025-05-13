@@ -31,7 +31,7 @@ export default function GenerarOrdenDePago() {
 
     // Calcular importe total de facturas
     useEffect(() => {
-        const total = facturas.reduce((sum, f) => sum + f.aplica, 0);
+        const total = facturas.reduce((sum, f) => sum + f.total, 0);
         setImporteTotal(total);
     }, [facturas]);
 
@@ -52,8 +52,7 @@ export default function GenerarOrdenDePago() {
         }
     };
 
-    const formatNumber = num =>
-        num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
 
     const openModal = type => {
         setModalType(type);
@@ -165,7 +164,7 @@ export default function GenerarOrdenDePago() {
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Importe total</label>
-                        <input readOnly value={formatNumber(importeTotal)} />
+                        <input readOnly value={(importeTotal)} />
                     </div>
                 </form>
 
@@ -185,9 +184,9 @@ export default function GenerarOrdenDePago() {
                             <tr key={idx}>
                                 <td>{f.fecha_exp}</td>
                                 <td>{f.nro_factura}</td>
-                                <td>{formatNumber(f.total)}</td>
-                                <td>{formatNumber(f.saldo)}</td>
-                                <td>{formatNumber(f.aplica)}</td>
+                                <td>{(f.total)}</td>
+                                <td>{(f.saldo)}</td>
+                                <td>{(f.aplica)}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -292,7 +291,7 @@ export default function GenerarOrdenDePago() {
                                 <td>{p.fecha}</td>
                                 <td>{p.tipo}</td>
                                 <td>{p.cuenta}</td>
-                                <td>{formatNumber(p.monto)}</td>
+                                <td>{(p.monto)}</td>
                                 <td>
                                     <button onClick={() => deletePago(p.id)}>🗑️</button>
                                 </td>
