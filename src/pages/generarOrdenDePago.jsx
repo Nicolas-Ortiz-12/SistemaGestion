@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import styles from '../pages/generarOrdenDePago.module.css';
@@ -9,137 +9,146 @@ export default function GenerarOrdenDePago() {
     const facturas = location.state?.facturas || [];
     const proveedorInicial = location.state?.proveedor || '';
 
-    const [proveedor, setProveedor] = useState(proveedorInicial);
+    const [proveedor] = useState(proveedorInicial);
     const [nroPago, setNroPago] = useState('');
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
-    const [importeTotal, setImporteTotal] = useState(0);
+    const [importeTotal, setImporteTotal] = useState(
+        facturas.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
+    );
 
+    // Movimientos locales para esta orden
+    const [movimientos, setMovimientos] = useState([]);
+
+    // Modal
     const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState('');
+    const [modalType, setModalType] = useState(''); // 'transferencia'|'cheque'
     const [modalFields, setModalFields] = useState({
-        fechaEmision: new Date().toISOString().split('T')[0],
-        nroReferencia: '',
-        numeroTransferencia: '',
-        correlativo: false,
-        monto: '',
-        cuentaDestino: '',
-        concepto: '',
-        banco: '',
-        numeroCheque: ''
+        IdMovi: null,
+        Fecha: new Date().toISOString().split('T')[0],
+        Monto: '',
+        CtaDestino: '',
+        Beneficiario: proveedorInicial,
+        Concepto: '',
+        Motivo: '',
+        Estado: '',
+        IdCuenta: '1', // Ajusta según tu cuenta origen
+        IdTran: '' // 1=Transferencia,2=Cheque
     });
-    const [pagos, setPagos] = useState([]);
 
-    // Calcular importe total de facturas
-    useEffect(() => {
-        const total = facturas.reduce((sum, f) => sum + f.total, 0);
-        setImporteTotal(total);
-    }, [facturas]);
-
-    // Cargar pagos ya guardados (si se edita)
-    useEffect(() => {
-        fetchPagos();
-    }, []);
-
-    const fetchPagos = async () => {
-        try {
-            const res = await fetch('https://localhost:7149/api/OrdenDePago');
-            if (!res.ok) throw new Error('Error al obtener pagos');
-            const data = await res.json();
-            setPagos(data);
-        } catch (err) {
-            console.error(err);
-            alert('No se pudieron cargar los pagos.');
-        }
-    };
-
-  
-
-    const openModal = type => {
+    // Abre modal en modo crear o editar
+    const openModal = (type, mov = null) => {
         setModalType(type);
-        setModalFields({
-            fechaEmision: new Date().toISOString().split('T')[0],
-            nroReferencia: '',
-            numeroTransferencia: '',
-            correlativo: false,
-            monto: '',
-            cuentaDestino: '',
-            concepto: '',
-            banco: '',
-            numeroCheque: ''
-        });
+        if (mov) {
+            // editar
+            setModalFields({ ...mov, IdMovi: mov.idMovi });
+        } else {
+            // nuevo
+            setModalFields({
+                IdMovi: null,
+                Fecha: new Date().toISOString().split('T')[0],
+                Monto: '',
+                CtaDestino: '',
+                Beneficiario: proveedor,
+                Concepto: '',
+                Motivo: '',
+                Estado: '',
+                IdCuenta: '1',
+                IdTran: type === 'transferencia' ? '1' : '2'
+            });
+        }
         setShowModal(true);
     };
 
     const closeModal = () => setShowModal(false);
 
     const handleFieldChange = e => {
-        const { name, value, type, checked } = e.target;
-        setModalFields(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        const { name, value } = e.target;
+        setModalFields(prev => ({ ...prev, [name]: value }));
     };
 
-    // Guarda pago en BD y en estado
-    const savePago = async () => {
-        const pagoObj = {
-            fecha: modalFields.fechaEmision,
-            tipo: modalType === 'transferencia' ? 'Transferencia' : 'Cheque',
-            cuenta: modalType === 'transferencia' ? modalFields.cuentaDestino : modalFields.banco,
-            monto: parseFloat(modalFields.monto),
-            referencia: modalType === 'transferencia' ? modalFields.numeroTransferencia : modalFields.numeroCheque,
-            concepto: modalFields.concepto
+    // Guarda o actualiza un movimiento solo localmente y en API
+    const saveMovimiento = async () => {
+        const payload = {
+            fecha: modalFields.Fecha,
+            monto: parseFloat(modalFields.Monto),
+            ctaDestino: modalFields.CtaDestino,
+            beneficiario: modalFields.Beneficiario,
+            concepto: modalFields.Concepto,
+            motivo: modalFields.Motivo,
+            estado: modalFields.Estado,
+            idCuenta: parseInt(modalFields.IdCuenta, 10),
+            idTran: parseInt(modalFields.IdTran, 10)
+        };
+
+        try {
+            let res, data;
+            if (modalFields.IdMovi) {
+                // editar
+                res = await fetch(
+                    `https://localhost:7149/api/Movimiento/${modalFields.IdMovi}`,
+                    {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }
+                );
+                if (!res.ok) throw new Error();
+                data = { ...modalFields }; // mantener valores locales
+                setMovimientos(movs => movs.map(m => (m.IdMovi === data.IdMovi ? data : m)));
+            } else {
+                // crear
+                res = await fetch('https://localhost:7149/api/Movimiento', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error();
+                data = await res.json();
+                setMovimientos(movs => [...movs, data]);
+            }
+            closeModal();
+        } catch {
+            alert('Error al guardar el movimiento.');
+        }
+    };
+
+    // Elimina un movimiento localmente y API
+    const deleteMovimiento = async id => {
+        if (!window.confirm('¿Eliminar este movimiento?')) return;
+        try {
+            const res = await fetch(
+                `https://localhost:7149/api/Movimiento/${id}`,
+                { method: 'DELETE' }
+            );
+            if (!res.ok) throw new Error();
+            setMovimientos(movs => movs.filter(m => m.idMovi !== id));
+        } catch {
+            alert('No se pudo eliminar.');
+        }
+    };
+
+    // Generar la orden completa (envía facturas + movimientos locales)
+    const generarOrden = async () => {
+        if (movimientos.length === 0) {
+            alert('Debes registrar al menos un movimiento de pago.');
+            return;
+        }
+        const dto = {
+            NroOrden: nroPago,
+            MovimientoIds: movimientos.map(m => m.idMovi),
+            FacturaIds: facturas.map(f => f.id_factura)
         };
         try {
             const res = await fetch('https://localhost:7149/api/OrdenDePago', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(pagoObj)
+                body: JSON.stringify(dto)
             });
-            if (!res.ok) throw new Error('Error al guardar pago');
-            const newPago = await res.json();
-            setPagos(prev => [...prev, newPago]);
-            closeModal();
-        } catch (err) {
-            console.error(err);
-            alert('No se pudo guardar el pago.');
-        }
-    };
-
-    // Eliminar pago de BD y estado
-    const deletePago = async id => {
-        try {
-            const res = await fetch(`/api/pagos/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Error al eliminar pago');
-            setPagos(prev => prev.filter(p => p.id !== id));
-        } catch (err) {
-            console.error(err);
-            alert('No se pudo eliminar el pago.');
-        }
-    };
-
-    // Generar orden y guardar en BD
-    const generarOrden = async () => {
-        const ordenObj = {
-            proveedor,
-            nroPago,
-            fecha,
-            importeTotal,
-            facturas,
-            pagos
-        };
-        try {
-            const res = await fetch('/api/ordenes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(ordenObj)
-            });
-            if (!res.ok) throw new Error('Error al generar orden');
+            if (!res.ok) throw new Error();
             const orden = await res.json();
-            alert(`Orden ${orden.id} generada correctamente.`);
-            navigate(`/ordenes/${orden.id}`);
-        } catch (err) {
-            console.error(err);
+            alert(`Orden ${orden.idOrden} generada`);
+            navigate(`/ordenes/${orden.idOrden}`);
+        } catch {
             alert('No se pudo generar la orden.');
         }
     };
@@ -149,6 +158,7 @@ export default function GenerarOrdenDePago() {
             <main className={styles.main}>
                 <Header title="Detalle Orden De Pago" />
 
+                {/* Cabecera */}
                 <form className={styles.formHeader} onSubmit={e => e.preventDefault()}>
                     <div className={styles.inputGroup}>
                         <label>Proveedor</label>
@@ -160,14 +170,19 @@ export default function GenerarOrdenDePago() {
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Fecha</label>
-                        <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
+                        <input
+                            type="date"
+                            value={fecha}
+                            onChange={e => setFecha(e.target.value)}
+                        />
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Importe total</label>
-                        <input readOnly value={(importeTotal)} />
+                        <input readOnly value={importeTotal} />
                     </div>
                 </form>
 
+                {/* Facturas */}
                 <h2 className={styles.sectionTitle}>Facturas A Pagar</h2>
                 <table className={styles.table}>
                     <thead>
@@ -176,134 +191,98 @@ export default function GenerarOrdenDePago() {
                             <th>N°Factura</th>
                             <th>Total</th>
                             <th>Saldo</th>
-                            <th>Aplica</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
-                        {facturas.map((f, idx) => (
-                            <tr key={idx}>
+                        {facturas.map((f, i) => (
+                            <tr key={i}>
                                 <td>{f.fecha_exp}</td>
                                 <td>{f.nro_factura}</td>
-                                <td>{(f.total)}</td>
-                                <td>{(f.saldo)}</td>
-                                <td>{(f.aplica)}</td>
+                                <td>{f.total}</td>
+                                <td>{f.saldo}</td>
+                                
                             </tr>
                         ))}
                     </tbody>
                 </table>
 
+                {/* Métodos de pago */}
                 <div className={styles.metodoContainer}>
                     <h2>Método De Pago</h2>
-                    <button type="button" className={styles.btnTransferencia} onClick={() => openModal('transferencia')}>
+                    <button
+                        onClick={() => openModal('transferencia')}
+                        className={styles.btn}
+                    >
                         Transferencia
                     </button>
-                    <button type="button" className={styles.btnCheques} onClick={() => openModal('cheque')}>
-                        Cheques
+                    <button onClick={() => openModal('cheque')} className={styles.btn}>
+                        Cheque
                     </button>
                 </div>
 
-                {/* Modal */}
+                {/* Modal Crear/Editar */}
                 {showModal && (
                     <div className={styles.modalOverlay}>
                         <div className={styles.modal}>
                             <div className={styles.modalHeader}>
-                                <h3>{modalType === 'transferencia' ? 'Transferencia' : 'Cheque'}</h3>
-                                <button className={styles.closeBtn} onClick={closeModal}>×</button>
+                                <h3>{modalFields.IdMovi ? 'Editar' : 'Nuevo'} {modalType}</h3>
+                                <button onClick={closeModal}>×</button>
                             </div>
                             <div className={styles.modalContent}>
+                                {['Fecha', 'Monto', 'CtaDestino', 'Beneficiario', 'Concepto', 'Motivo', 'Estado'].map(name => (
+                                    <div key={name} className={styles.formRow}>
+                                        <label>{name}:</label>
+                                        <input
+                                            type={name === 'Fecha' ? 'date' : 'text'}
+                                            name={name}
+                                            value={modalFields[name]}
+                                            onChange={handleFieldChange}
+                                        />
+                                    </div>
+                                ))}
                                 <div className={styles.formRow}>
-                                    <label>Fecha de Emisión:</label>
-                                    <input
-                                        type="date"
-                                        name="fechaEmision"
-                                        value={modalFields.fechaEmision}
-                                        onChange={handleFieldChange}
-                                    />
-                                </div>
-
-                                {modalType === 'transferencia' ? (
-                                    <>
-                                        <div className={styles.formRow}>
-                                            <label>Nro. Referencia:</label>
-                                            <input name="nroReferencia" value={modalFields.nroReferencia} onChange={handleFieldChange} />
-                                        </div>
-                                        <div className={styles.formRow}>
-                                            <label>Nro. Transferencia:</label>
-                                            <input name="numeroTransferencia" value={modalFields.numeroTransferencia} onChange={handleFieldChange} />
-                                            <label className={styles.checkboxGroup}>
-                                                <input
-                                                    type="checkbox"
-                                                    name="correlativo"
-                                                    checked={modalFields.correlativo}
-                                                    onChange={handleFieldChange}
-                                                />
-                                                Número Correlativo
-                                            </label>
-                                        </div>
-                                        <div className={styles.formRow}>
-                                            <label>Monto:</label>
-                                            <input name="monto" value={modalFields.monto} onChange={handleFieldChange} />
-                                        </div>
-                                        <div className={styles.formRow}>
-                                            <label>Cuenta Destino:</label>
-                                            <input name="cuentaDestino" value={modalFields.cuentaDestino} onChange={handleFieldChange} />
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className={styles.formRow}>
-                                            <label>Banco:</label>
-                                            <input name="banco" value={modalFields.banco} onChange={handleFieldChange} />
-                                        </div>
-                                        <div className={styles.formRow}>
-                                            <label>Nro. Cheque:</label>
-                                            <input name="numeroCheque" value={modalFields.numeroCheque} onChange={handleFieldChange} />
-                                        </div>
-                                    </>
-                                )}
-
-                                <div className={styles.formRow}>
-                                    <label>Concepto:</label>
-                                    <input name="concepto" value={modalFields.concepto} onChange={handleFieldChange} />
-                                </div>
-
-                                <div className={styles.formRow}>
-                                    <button className={styles.btnGuardar} onClick={savePago}>Guardar</button>
+                                    <button onClick={saveMovimiento}>Guardar</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
 
+                {/* Listado de pagos (solo los movimientos cargados) */}
+                <h2 className={styles.sectionTitle}>Pagos Registrados</h2>
                 <table className={styles.table}>
                     <thead>
                         <tr>
                             <th>Fecha</th>
-                            <th>Tipo de Pago</th>
-                            <th>Cuenta Bancaria</th>
                             <th>Monto</th>
+                            <th>Cuenta</th>
+                            <th>Concepto</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {pagos.map(p => (
-                            <tr key={p.id}>
-                                <td>{p.fecha}</td>
-                                <td>{p.tipo}</td>
-                                <td>{p.cuenta}</td>
-                                <td>{(p.monto)}</td>
+                        {movimientos.map(m => (
+                            <tr key={m.idMovi}>
+                                <td>{m.fecha}</td>
+                                <td>{m.monto}</td>
+                                <td>{m.ctaDestino || m.nroCuenta}</td>
+                                <td>{m.concepto}</td>
                                 <td>
-                                    <button onClick={() => deletePago(p.id)}>🗑️</button>
+                                    <button onClick={() => openModal(m.idTran === 1 ? 'transferencia' : 'cheque', m)}>
+                                        ✏️
+                                    </button>
+                                    <button onClick={() => deleteMovimiento(m.idMovi)}>🗑️</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
 
-                {/* Acciones finales */}
+                {/* Generar orden */}
                 <div className={styles.actions}>
-                    <button className={styles.buttonVolver} onClick={() => navigate(-1)}>Volver</button>
-                    <button className={styles.buttonGenerar} onClick={generarOrden}>Generar Orden</button>
+                    <button onClick={() => navigate(-1)}>Volver</button>
+                    <button onClick={generarOrden}>Generar Orden</button>
                 </div>
             </main>
         </div>

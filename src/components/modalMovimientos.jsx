@@ -30,7 +30,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
     const handleSave = async () => {
         const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
         const nombreTipo = seleccion?.nombre;
-        const estado = nombreTipo === 'Emisión de cheque' ? 'Pendiente' : 'Activo';
+        const estado = nombreTipo === 'Cheque' ? 'Pendiente' : 'Activo';
 
         const formData = new FormData();
         formData.append('Monto', monto);

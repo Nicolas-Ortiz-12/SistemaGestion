@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './modalAgregarTipoTransaccion.module.css';
+import styles from './modalAgregarTransaccion.module.css';
 
 export default function AgregarTipoTransaccion({ isOpen, onClose, onTipoAgregado }) {
     const [nombre, setNombre] = useState('');
@@ -40,7 +40,9 @@ export default function AgregarTipoTransaccion({ isOpen, onClose, onTipoAgregado
     return (
         <div className={styles.overlay}>
             <div className={styles.modal}>
-                <h2>Agregar Tipo de Transacción</h2>
+                <div className={styles.header}>
+                    Agregar Tipo de Transacción
+                </div>
                 <div className={styles.form}>
                     <div className={styles.row}>
                         <div className={styles.field}>

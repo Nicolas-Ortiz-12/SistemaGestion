@@ -52,7 +52,9 @@ export default function MovimientosBancarios() {
     const fetchMovimientos = async () => {
         setErrorMov(null)
         try {
-            const resp = await fetch(`https://localhost:7149/api/Movimiento?cuentaId=${state.account.id}`)
+            const resp = await fetch(
+                `https://localhost:7149/api/Movimiento/cuenta/${state.account.idCuenta}`
+            )
             if (!resp.ok) throw new Error('Error al cargar movimientos')
             const data = await resp.json()
             setMovimientos(data)
@@ -60,7 +62,6 @@ export default function MovimientosBancarios() {
             setErrorMov(err.message)
         }
     }
-console.log(concSaldo2do)
 
     // Fetch Cuenta
     const fetchCuenta = async () => {
@@ -82,7 +83,7 @@ console.log(concSaldo2do)
             const resp = await fetch(`https://localhost:7149/api/Movimiento/pendientes?cuentaId=${state.account.id}`)
             if (!resp.ok) throw new Error('Error al cargar conciliaciones pendientes')
             const data = await resp.json()
-            setConciliaciones(data.map(c => ({ ...c, estado: 'Pendiente' })))
+            setConciliaciones(data)
         } catch (err) {
             setErrorConc(err.message)
         }
@@ -140,6 +141,10 @@ console.log(concSaldo2do)
 
     // Manejo de guardado de nuevo movimiento
     const handleSaveMovimiento = savedMov => {
+        // Si el movimiento es de tipo "cheque", marcar como Pendiente
+        if (savedMov.transaccion.tipoMov === 'Cheque' || savedMov.transaccion.nombre.toLowerCase().includes('cheque')) {
+            savedMov.estado = 'Pendiente'
+        }
         setMovimientos(prev => [savedMov, ...prev])
         setCurrentPage(1)
         fetchCuenta()
