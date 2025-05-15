@@ -11,7 +11,6 @@ export default function MovimientosBancarios() {
     const { state } = useLocation()
     const navigate = useNavigate()
 
-    // Redirigir si no hay información del banco
     if (!state?.bank) {
         useEffect(() => {
             navigate('/listaDeBancos')
@@ -19,36 +18,29 @@ export default function MovimientosBancarios() {
         return null
     }
 
-    // Estados de cuenta y movimientos
     const [cuenta, setCuenta] = useState({ saldo: 0 })
     const [errorCuenta, setErrorCuenta] = useState(null)
     const [movimientos, setMovimientos] = useState([])
     const [errorMov, setErrorMov] = useState(null)
 
-    // Estados de conciliaciones
     const [conciliaciones, setConciliaciones] = useState([])
     const [errorConc, setErrorConc] = useState(null)
 
-    // Tabs y paginación
     const [activeTab, setActiveTab] = useState('movimientos')
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPageMov = 5
     const itemsPerPageCon = 10
 
-    // Formulario de conciliación
     const [concFecha, setConcFecha] = useState(new Date().toISOString().slice(0, 10))
     const [concSaldoAnt, setConcSaldoAnt] = useState('')
     const [concSaldo2do, setConcSaldo2do] = useState('')
     const [concSaldoAct, setConcSaldoAct] = useState(0)
     const [selectedConcMovs, setSelectedConcMovs] = useState([])
 
-    // Modal para agregar movimiento
     const [isModalOpen, setModalOpen] = useState(false)
 
-    // Formatea fecha ISO a legible
     const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-ES')
 
-    // Fetch Movimientos
     const fetchMovimientos = async () => {
         setErrorMov(null)
         try {
@@ -63,7 +55,6 @@ export default function MovimientosBancarios() {
         }
     }
 
-    // Fetch Cuenta
     const fetchCuenta = async () => {
         setErrorCuenta(null)
         try {
@@ -76,11 +67,10 @@ export default function MovimientosBancarios() {
         }
     }
 
-    // Fetch Conciliaciones Pendientes
     const fetchConciliaciones = async () => {
         setErrorConc(null)
         try {
-            const resp = await fetch(`https://localhost:7149/api/Movimiento/pendientes?cuentaId=${state.account.id}`)
+            const resp = await fetch(`https://localhost:7149/api/Movimiento/pendientes/${state.account.idCuenta}`)
             if (!resp.ok) throw new Error('Error al cargar conciliaciones pendientes')
             const data = await resp.json()
             setConciliaciones(data)
@@ -89,7 +79,6 @@ export default function MovimientosBancarios() {
         }
     }
 
-    // Efectos de carga
     useEffect(() => {
         if (activeTab === 'movimientos') fetchMovimientos()
     }, [activeTab, state.account.id])
@@ -102,13 +91,11 @@ export default function MovimientosBancarios() {
         if (activeTab === 'conciliaciones') fetchConciliaciones()
     }, [activeTab, state.account.id])
 
-    // Actualiza saldo actual al cambiar selección
     useEffect(() => {
         const sum = selectedConcMovs.reduce((acc, mov) => acc + mov.monto, 0)
         setConcSaldoAct(sum)
     }, [selectedConcMovs])
 
-    // Maneja selección de movimiento para conciliación
     const handleSelectConc = (mov, checked) => {
         if (checked) {
             setSelectedConcMovs(prev => [...prev, mov])
@@ -117,31 +104,54 @@ export default function MovimientosBancarios() {
         }
     }
 
-    // Handler de Conciliación
-    const handleConciliar = () => {
+    const handleConciliar = async () => {
         const saldo2 = parseFloat(concSaldo2do)
         if (isNaN(saldo2)) {
             alert('Ingrese un valor numérico en Saldo 2do Edo. Cta.')
             return
         }
-        if (saldo2 === concSaldoAct) {
-            setConciliaciones(prev => prev.map(c =>
-                selectedConcMovs.some(m => m.idMovi === c.idMovi)
-                    ? { ...c, estado: 'Conciliado', fechaConciliacion: concFecha }
-                    : c
-            ))
+
+        if (saldo2 !== concSaldoAct) {
+            alert('El Saldo 2do Edo. Cta debe ser igual al Saldo Actual para conciliar')
+            return
+        }
+
+        const payload = {
+            cuentaId: state.account.idCuenta,
+            fechaConciliacion: concFecha,
+            movimientos: selectedConcMovs.map(m => m.idMovi)
+        }
+        console.log('Payload:', payload)
+
+        try {
+            const resp = await fetch('https://localhost:7149/api/Movimiento/conciliar', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+
+            if (!resp.ok) {
+                const errorText = await resp.text()
+                throw new Error(`Error al conciliar: ${errorText}`)
+            }
+
+            alert('Conciliación realizada con éxito.')
+
+            // Limpiar formulario y recargar conciliaciones
             setSelectedConcMovs([])
             setConcSaldoAnt('')
             setConcSaldo2do('')
             setConcSaldoAct(0)
-        } else {
-            alert('El Saldo 2do Edo. Cta debe ser igual al Saldo Actual para conciliar')
+            fetchConciliaciones()
+
+        } catch (err) {
+            alert(`Error: ${err.message}`)
         }
     }
 
-    // Manejo de guardado de nuevo movimiento
     const handleSaveMovimiento = savedMov => {
-        // Si el movimiento es de tipo "cheque", marcar como Pendiente
         if (savedMov.transaccion.tipoMov === 'Cheque' || savedMov.transaccion.nombre.toLowerCase().includes('cheque')) {
             savedMov.estado = 'Pendiente'
         }
@@ -150,12 +160,10 @@ export default function MovimientosBancarios() {
         fetchCuenta()
     }
 
-    // Paginación Movimientos
     const startMov = (currentPage - 1) * itemsPerPageMov
     const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
     const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
 
-    // Paginación Conciliaciones
     const startCon = (currentPage - 1) * itemsPerPageCon
     const pageCon = conciliaciones.slice(startCon, startCon + itemsPerPageCon)
     const totalPagesCon = Math.ceil(conciliaciones.length / itemsPerPageCon)
@@ -184,7 +192,7 @@ export default function MovimientosBancarios() {
                 </div>
 
                 {activeTab === 'movimientos' && (
-                    <> {/* Movimientos bancarios */}
+                    <>
                         <div className={styles.balanceCard}>
                             <div className={styles.balanceTitle}>
                                 SALDO TOTAL<br />DE LA CUENTA
@@ -240,7 +248,7 @@ export default function MovimientosBancarios() {
                 )}
 
                 {activeTab === 'conciliaciones' && (
-                    <> {/* Conciliaciones */}
+                    <>
                         <div className={styles.conciliacionForm}>
                             <div>
                                 <label>Fecha:</label>
