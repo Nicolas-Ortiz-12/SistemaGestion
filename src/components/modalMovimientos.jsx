@@ -50,6 +50,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
             });
             if (!resp.ok) throw new Error(`Error ${resp.status}: No se guardó el movimiento`);
             console.log('Movimiento guardado correctamente');
+            window.location.reload();
             onClose();
         } catch (error) {
             console.error('Error al guardar Movimiento:', error);
@@ -61,7 +62,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
     const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
     const nombreTipo = seleccion?.nombre;
     const showCuentaDestino = nombreTipo === 'Transferencia';
-    const showBeneficiario = ['Transferencia', 'Emisión de cheque', 'Nota de crédito'].includes(nombreTipo);
+    const showBeneficiario = ['Transferencia', 'Cheque', 'Nota de Credito'].includes(nombreTipo);
 
     return (
         <>

@@ -198,7 +198,7 @@ export default function MovimientosBancarios() {
                                 SALDO TOTAL<br />DE LA CUENTA
                             </div>
                             <div className={styles.balanceAmount}>
-                                {errorCuenta ? '—' : state.account.saldo.toLocaleString('es-PY') + '₲'}
+                                {errorCuenta ? '—' : cuenta.saldo.toLocaleString('es-PY') + '₲'}
                             </div>
                         </div>
 
