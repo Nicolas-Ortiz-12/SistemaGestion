@@ -14,7 +14,6 @@ export default function ListaDeBancos() {
     const [tipoModal, setTipoModal] = useState(null);
     const [cuentaSeleccionada, setCuentaSeleccionada] = useState(null);
 
-    // 1️⃣ Traer las cuentas desde el servidor
     const fetchCuentas = async () => {
         try {
             const res = await fetch('https://localhost:7149/api/Cuenta');
@@ -30,18 +29,18 @@ export default function ListaDeBancos() {
         fetchCuentas();
     }, []);
 
-    // 2️⃣ Abrir modal de elegir cuenta
+
     const abrirModalElegir = () => {
         setTipoModal('editar');
     };
 
-    // 3️⃣ Recibe la cuenta desde ModalElegirCuenta
+
     const handleContinuar = (cuenta) => {
         setCuentaSeleccionada(cuenta);
         setTipoModal('editarBanco');
     };
 
-    // 4️⃣ Cierra modal de editar
+    
     const handleCerrarEditar = () => {
         setTipoModal(null);
     };

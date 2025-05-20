@@ -121,7 +121,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                             </div>
                         </div>
 
-                        {/* Cuenta de destino */}
+
                         {showCuentaDestino && (
                             <div className={styles.row}>
                                 <div className={styles.field}>
@@ -137,7 +137,6 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                             </div>
                         )}
 
-                        {/* Beneficiario */}
                         {showBeneficiario && (
                             <div className={styles.row}>
                                 <div className={styles.field}>
@@ -153,7 +152,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                             </div>
                         )}
 
-                        {/* Concepto */}
+
                         <div className={styles.row}>
                             <div className={styles.field} style={{ width: '100%' }}>
                                 <label>Concepto</label>

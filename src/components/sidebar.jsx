@@ -6,12 +6,12 @@ import proveedoresImg from '../img/icono1.png';
 import listaDeBancosImg from '../img/Banco.png';
 import ordenDePagoImg from '../img/OrdenDePago.png';
 import movimentosImg from '../img/Movimientos.png';
+import reportesImg from '../img/reportes.png'; 
 
 export default function Sidebar() {
     const { pathname } = useLocation();
     const [activeIndex, setActiveIndex] = useState(0);
 
-    // Actualiza el índice según la ruta actual
     useEffect(() => {
         if (pathname.includes('listaDeBancos') || pathname.includes('movimientoBancarios')) {
             setActiveIndex(0);
@@ -19,16 +19,18 @@ export default function Sidebar() {
             setActiveIndex(1);
         } else if (pathname.includes('ordenDePago')) {
             setActiveIndex(2);
+        } else if (pathname.includes('reportes')) {
+            setActiveIndex(3);
         }
     }, [pathname]);
 
-    // Devuelve el logo según la ruta actual
     const getLogoForRoute = () => {
         if (pathname.includes('proveedores')) return proveedoresImg;
         if (pathname.includes('ordenDePago')) return ordenDePagoImg;
         if (pathname.includes('listaDeBancos')) return listaDeBancosImg;
         if (pathname.includes('movimientoBancarios')) return movimentosImg;
-        return listaDeBancosImg; // Por defecto
+        if (pathname.includes('reportes')) return reportesImg; // NUEVO
+        return listaDeBancosImg;
     };
 
     return (
@@ -72,6 +74,16 @@ export default function Sidebar() {
                             }
                         >
                             Orden de pago
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to="/reportes"
+                            className={({ isActive }) =>
+                                isActive ? styles.active : styles.link
+                            }
+                        >
+                            Reportes
                         </NavLink>
                     </li>
                 </ul>
