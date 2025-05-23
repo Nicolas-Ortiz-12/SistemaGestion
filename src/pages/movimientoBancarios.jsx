@@ -159,10 +159,13 @@ export default function MovimientosBancarios() {
         setCurrentPage(1)
         fetchCuenta()
     }
+    const filteredMovimientos = movimientos.filter(
+    m => ['Activo', 'Emitido', 'Conciliado'].includes(m.estado)
+    )
 
     const startMov = (currentPage - 1) * itemsPerPageMov
-    const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
-    const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
+    const pageMov = filteredMovimientos.slice(startMov, startMov + itemsPerPageMov)
+    const totalPagesMov = Math.ceil(filteredMovimientos.length / itemsPerPageMov)
 
     const startCon = (currentPage - 1) * itemsPerPageCon
     const pageCon = conciliaciones.slice(startCon, startCon + itemsPerPageCon)

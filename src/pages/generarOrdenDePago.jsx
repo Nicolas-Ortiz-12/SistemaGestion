@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import styles from '../pages/generarOrdenDePago.module.css';
@@ -8,6 +8,39 @@ export default function GenerarOrdenDePago() {
     const navigate = useNavigate();
     const facturas = location.state?.facturas || [];
     const proveedorInicial = location.state?.proveedor || '';
+    const [cuentas, setCuentas] = useState([]);
+    useEffect(() => {
+        const fetchCuentas = async () => {
+            try {
+                const res = await fetch('https://localhost:7149/api/Cuenta');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                setCuentas(data);
+            } catch {
+                alert('No se pudieron cargar las cuentas.');
+            }
+        };
+
+        fetchCuentas();
+    }, []);
+    useEffect(() => {
+        const fetchMovimientosPendientes = async () => {
+            try {
+                const res = await fetch('https://localhost:7149/api/Movimiento');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                // Filtrar los que están en estado pendiente
+                const pendientes = data.filter(m => m.estado === 'pendiente');
+                setMovimientos(pendientes);
+            } catch (error) {
+                console.error('Error al cargar movimientos:', error);
+                alert('No se pudieron cargar los movimientos pendientes.');
+            }
+        };
+
+        fetchMovimientosPendientes();
+    }, []);
 
     const [proveedor] = useState(proveedorInicial);
     const [nroPago, setNroPago] = useState('');
@@ -51,8 +84,8 @@ export default function GenerarOrdenDePago() {
                 Beneficiario: proveedor,
                 Concepto: '',
                 Motivo: '',
-                Estado: '',
-                IdCuenta: '1',
+                Estado: 'pendiente',
+                IdCuenta: cuentas[0]?.idCuenta?.toString() || '1',
                 IdTran: type === 'transferencia' ? '1' : '2'
             });
         }
@@ -68,46 +101,49 @@ export default function GenerarOrdenDePago() {
 
     // Guarda o actualiza un movimiento solo localmente y en API
     const saveMovimiento = async () => {
-        const payload = {
-            fecha: modalFields.Fecha,
-            monto: parseFloat(modalFields.Monto),
-            ctaDestino: modalFields.CtaDestino,
-            beneficiario: modalFields.Beneficiario,
-            concepto: modalFields.Concepto,
-            motivo: modalFields.Motivo,
-            estado: modalFields.Estado,
-            idCuenta: parseInt(modalFields.IdCuenta, 10),
-            idTran: parseInt(modalFields.IdTran, 10)
-        };
+        const estadoInicial = 'pendiente';
+
+        // Formatear fecha si viene como Date
+        const fechaFormateada = typeof modalFields.Fecha === 'string'
+            ? modalFields.Fecha
+            : modalFields.Fecha.toISOString().split('T')[0];
+
+        const formData = new FormData();
+        formData.append("fecha", fechaFormateada);
+        formData.append("Monto", modalFields.Monto);
+        formData.append("CtaDestino", modalFields.CtaDestino || 0);
+        formData.append("Beneficiario", modalFields.Beneficiario);
+        formData.append("Concepto", modalFields.Concepto);
+        formData.append("Motivo", modalFields.Motivo);
+        formData.append("Estado", estadoInicial);
+        formData.append("IdCuenta", modalFields.IdCuenta);
+        formData.append("IdTran", modalFields.IdTran);
 
         try {
             let res, data;
             if (modalFields.IdMovi) {
-                // editar
-                res = await fetch(
-                    `https://localhost:7149/api/Movimiento/${modalFields.IdMovi}`,
-                    {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    }
-                );
+                // Editar
+                res = await fetch(`https://localhost:7149/api/Movimiento/${modalFields.IdMovi}`, {
+                    method: 'PUT',
+                    body: formData
+                    // 👇 No pongas 'Content-Type', el navegador lo hace por ti con FormData
+                });
                 if (!res.ok) throw new Error();
-                data = { ...modalFields }; // mantener valores locales
+                data = { ...modalFields };
                 setMovimientos(movs => movs.map(m => (m.IdMovi === data.IdMovi ? data : m)));
             } else {
-                // crear
+                // Crear
                 res = await fetch('https://localhost:7149/api/Movimiento', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: formData
                 });
                 if (!res.ok) throw new Error();
                 data = await res.json();
                 setMovimientos(movs => [...movs, data]);
             }
             closeModal();
-        } catch {
+        } catch (error) {
+            console.error("Error al guardar el movimiento:", error);
             alert('Error al guardar el movimiento.');
         }
     };
@@ -191,7 +227,7 @@ export default function GenerarOrdenDePago() {
                             <th>N°Factura</th>
                             <th>Total</th>
                             <th>Saldo</th>
-                            
+
                         </tr>
                     </thead>
                     <tbody>
@@ -201,7 +237,7 @@ export default function GenerarOrdenDePago() {
                                 <td>{f.nro_factura}</td>
                                 <td>{f.total}</td>
                                 <td>{f.saldo}</td>
-                                
+
                             </tr>
                         ))}
                     </tbody>
@@ -230,7 +266,7 @@ export default function GenerarOrdenDePago() {
                                 <button onClick={closeModal}>×</button>
                             </div>
                             <div className={styles.modalContent}>
-                                {['Fecha', 'Monto', 'CtaDestino', 'Beneficiario', 'Concepto', 'Motivo', 'Estado'].map(name => (
+                                {['Fecha', 'Monto', 'Beneficiario', 'Concepto', 'Motivo'].map(name => (
                                     <div key={name} className={styles.formRow}>
                                         <label>{name}:</label>
                                         <input
@@ -242,7 +278,22 @@ export default function GenerarOrdenDePago() {
                                     </div>
                                 ))}
                                 <div className={styles.formRow}>
-                                    <button onClick={saveMovimiento}>Guardar</button>
+                                    <label>Cuenta Origen:</label>
+                                    <select
+                                        name="IdCuenta"
+                                        value={modalFields.IdCuenta}
+                                        onChange={handleFieldChange}
+                                    >
+                                        {cuentas.map(c => (
+                                            <option key={c.idCuenta} value={c.idCuenta}>
+                                                {c.nombre} - {c.nroCuenta}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className={styles.modalActions}>
+                                    <button className={styles.btn} onClick={saveMovimiento}>Guardar</button>
+                                    <button className={styles.btnCancelar} onClick={closeModal}>Cancelar</button>
                                 </div>
                             </div>
                         </div>
@@ -262,20 +313,22 @@ export default function GenerarOrdenDePago() {
                         </tr>
                     </thead>
                     <tbody>
-                        {movimientos.map(m => (
-                            <tr key={m.idMovi}>
-                                <td>{m.fecha}</td>
-                                <td>{m.monto}</td>
-                                <td>{m.ctaDestino || m.nroCuenta}</td>
-                                <td>{m.concepto}</td>
-                                <td>
-                                    <button onClick={() => openModal(m.idTran === 1 ? 'transferencia' : 'cheque', m)}>
-                                        ✏️
-                                    </button>
-                                    <button onClick={() => deleteMovimiento(m.idMovi)}>🗑️</button>
-                                </td>
-                            </tr>
-                        ))}
+                        {movimientos
+                            .filter(m => m.estado === 'pendiente')
+                            .map(m => (
+                                <tr key={m.idMovi}>
+                                    <td>{m.fecha}</td>
+                                    <td>{m.monto}</td>
+                                    <td>{cuentas.find(c => c.idCuenta === Number(m.idCuenta))?.nroCuenta || '(sin cuenta)'}</td>
+                                    <td>{m.concepto}</td>
+                                    <td>
+                                        <button onClick={() => openModal(m.idTran === 1 ? 'transferencia' : 'cheque', m)}>
+                                            ✏️
+                                        </button>
+                                        <button onClick={() => deleteMovimiento(m.idMovi)}>🗑️</button>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
 
