@@ -27,13 +27,26 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
         fetchTipos();
     }, []);
 
+    const formatearMonto = (valor) => {
+        const soloNumeros = valor.replace(/\D/g, '');
+        return soloNumeros.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
+    const handleMontoChange = (e) => {
+        const valor = e.target.value;
+        const formateado = formatearMonto(valor);
+        setMonto(formateado);
+    };
+
     const handleSave = async () => {
         const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
         const nombreTipo = seleccion?.nombre;
         const estado = nombreTipo === 'Cheque' ? 'Emitido' : 'Activo';
 
+        const montoNumerico = monto.replace(/\./g, '');
+
         const formData = new FormData();
-        formData.append('Monto', monto);
+        formData.append('Monto', montoNumerico);
         formData.append('CtaDestino', cuentaDestino || 0);
         formData.append('Beneficiario', beneficiario || null);
         formData.append('Concepto', concepto);
@@ -98,7 +111,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                             </div>
                         </div>
 
-                        {/* Fecha y monto */}
+                        {/* Fecha y Monto */}
                         <div className={styles.row}>
                             <div className={styles.field}>
                                 <label>Fecha</label>
@@ -112,16 +125,16 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                             <div className={styles.field}>
                                 <label>Monto</label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     placeholder="Ingrese el monto"
                                     className={styles.input}
                                     value={monto}
-                                    onChange={e => setMonto(e.target.value)}
+                                    onChange={handleMontoChange}
                                 />
                             </div>
                         </div>
 
-
+                        {/* Cuenta destino si aplica */}
                         {showCuentaDestino && (
                             <div className={styles.row}>
                                 <div className={styles.field}>
@@ -137,6 +150,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                             </div>
                         )}
 
+                        {/* Beneficiario si aplica */}
                         {showBeneficiario && (
                             <div className={styles.row}>
                                 <div className={styles.field}>
@@ -152,7 +166,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                             </div>
                         )}
 
-
+                        {/* Concepto */}
                         <div className={styles.row}>
                             <div className={styles.field} style={{ width: '100%' }}>
                                 <label>Concepto</label>

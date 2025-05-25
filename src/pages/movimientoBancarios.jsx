@@ -159,13 +159,10 @@ export default function MovimientosBancarios() {
         setCurrentPage(1)
         fetchCuenta()
     }
-    const filteredMovimientos = movimientos.filter(
-    m => ['Activo', 'Emitido', 'Conciliado'].includes(m.estado)
-    )
 
     const startMov = (currentPage - 1) * itemsPerPageMov
-    const pageMov = filteredMovimientos.slice(startMov, startMov + itemsPerPageMov)
-    const totalPagesMov = Math.ceil(filteredMovimientos.length / itemsPerPageMov)
+    const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
+    const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
 
     const startCon = (currentPage - 1) * itemsPerPageCon
     const pageCon = conciliaciones.slice(startCon, startCon + itemsPerPageCon)
@@ -201,7 +198,7 @@ export default function MovimientosBancarios() {
                                 SALDO TOTAL<br />DE LA CUENTA
                             </div>
                             <div className={styles.balanceAmount}>
-                                {errorCuenta ? '—' : cuenta.saldo.toLocaleString('es-PY') + '₲'}
+                                {errorCuenta ? '—' : state.account.saldo.toLocaleString('es-PY') + '₲'}
                             </div>
                         </div>
 
@@ -261,15 +258,7 @@ export default function MovimientosBancarios() {
                                     onChange={e => setConcFecha(e.target.value)}
                                 />
                             </div>
-                            <div>
-                                <label>Saldo Anterior:</label>
-                                <input
-                                    type="text"
-                                    value={concSaldoAnt}
-                                    onChange={e => setConcSaldoAnt(e.target.value)}
-                                    placeholder="0.00"
-                                />
-                            </div>
+                        
                             <div>
                                 <label>Saldo 2do Edo. Cta:</label>
                                 <input
@@ -320,7 +309,7 @@ export default function MovimientosBancarios() {
                                                     />
                                                 </td>
                                                 <td>{formatDate(c.fecha)}</td>
-                                                <td>{c.fechaConciliacion || '—'}</td>
+                                                <td>{formatDate(c.fechaConciliacion) || '—'}</td>
                                                 <td>{c.monto.toLocaleString('es-PY')}</td>
                                                 <td>{c.estado}</td>
                                             </tr>

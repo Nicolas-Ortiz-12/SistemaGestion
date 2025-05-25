@@ -4,60 +4,83 @@ import autoTable from 'jspdf-autotable';
 import styles from '../components/modalReportes.module.css';
 
 export default function ModalReporteProveedores({ onClose }) {
-  const [cedula, setCedula] = useState('');
+  const [rucProveedor, setRucProveedor] = useState('');
 
-  const generarPDF = () => {
-  const doc = new jsPDF();
+  const generarPDF = async () => {
+    try {
+      const resp = await fetch(`https://localhost:7149/api/Factura/ruc/${rucProveedor}`);
+      if (!resp.ok) throw new Error('No se pudo obtener la información para el RUC proporcionado');
 
-  doc.setFontSize(16);
-  doc.text('REPORTE DE PROVEEDOR', 70, 15);
+      const facturas = await resp.json();
 
-  doc.setFontSize(12);
-  doc.text(`Cédula del Proveedor: ${cedula}`, 14, 30);
+      if (!Array.isArray(facturas) || facturas.length === 0) {
+        throw new Error('No se encontraron facturas para el RUC proporcionado');
+      }
 
-  // Datos adicionales del proveedor (fijos o simulados)
-  doc.text(`Nombre: Carlos López`, 14, 37);
-  doc.text(`Empresa: Maderas del Sur`, 14, 44);
-  doc.text(`Teléfono: (0981) 123-456`, 14, 51);
-  doc.text(`Dirección: Ruta 2 Km 45, Capiatá`, 14, 58);
+      const proveedor = facturas[0].proveedor;
+      if (!proveedor) throw new Error('No se encontró información del proveedor');
 
-  const datosMuestra = [
-    ['2024-03-01', 'Factura N°123', '500.000 Gs', 'Pagado'],
-    ['2024-03-10', 'Factura N°124', '600.000 Gs', 'Pendiente'],
-    ['2024-03-15', 'Factura N°125', '400.000 Gs', 'Pagado'],
-  ];
+      const doc = new jsPDF();
 
-  autoTable(doc, {
-    startY: 65,
-    head: [['Fecha', 'Factura', 'Monto', 'Estado']],
-    body: datosMuestra,
-  });
+      doc.setFontSize(16);
+      doc.text('REPORTE DE PROVEEDOR', 70, 15);
 
-  doc.text('Total facturado: 1.500.000 Gs', 14, doc.lastAutoTable.finalY + 10);
-  doc.text('Total pagado: 900.000 Gs', 14, doc.lastAutoTable.finalY + 18);
-  doc.text('Pendiente de pago: 600.000 Gs', 14, doc.lastAutoTable.finalY + 26);
+      doc.setFontSize(12);
+      doc.text(`ID Proveedor: ${proveedor.id_prov}`, 14, 30);
+      doc.text(`Nombre: ${proveedor.nombre}`, 14, 37);
+      doc.text(`RUC: ${proveedor.ruc}`, 14, 44);
+      doc.text(`Teléfono: ${proveedor.telefono}`, 14, 51);
+      doc.text(`Correo: ${proveedor.correo}`, 14, 58);
+      doc.text(`Dirección: ${proveedor.direccion}`, 14, 65);
+      doc.text(`Actividad: ${proveedor.actividad}`, 14, 72);
 
-  doc.output('dataurlnewwindow');
-};
+      const datosTabla = facturas.map(f => [
+        f.fecha_exp,
+        `Factura N°${f.nro_factura}`,
+        `${parseInt(f.total).toLocaleString()} Gs`,
+        f.saldo === 0 ? 'Pagado' : 'Pendiente'
+      ]);
 
+      autoTable(doc, {
+        startY: 80,
+        head: [['Fecha', 'Factura', 'Total', 'Estado']],
+        body: datosTabla
+      });
 
-  const handleSubmit = (e) => {
+      const totalFacturado = facturas.reduce((sum, f) => sum + f.total, 0);
+      const totalPendiente = facturas.reduce((sum, f) => sum + f.saldo, 0);
+      const totalPagado = totalFacturado - totalPendiente;
+
+      const y = doc.lastAutoTable.finalY + 10;
+      doc.text(`Total facturado: ${totalFacturado.toLocaleString()} Gs`, 14, y);
+      doc.text(`Total pagado: ${totalPagado.toLocaleString()} Gs`, 14, y + 8);
+      doc.text(`Pendiente de pago: ${totalPendiente.toLocaleString()} Gs`, 14, y + 16);
+
+      // Puedes cambiar esto por doc.save() si prefieres descarga directa
+      doc.output('dataurlnewwindow');
+    } catch (error) {
+      alert('Error al generar el reporte: ' + error.message);
+      console.error(error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    generarPDF();
+    await generarPDF();
     onClose();
   };
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2 className={styles.modalTitle}>Generar Reporte de Proveedores</h2>
+        <h2 className={styles.modalTitle}>Generar Reporte de Proveedor</h2>
         <form className={styles.conciliacionForm} onSubmit={handleSubmit}>
           <div>
-            <label>Cédula del Proveedor:</label>
+            <label>RUC del Proveedor:</label>
             <input
               type="text"
-              value={cedula}
-              onChange={(e) => setCedula(e.target.value)}
+              value={rucProveedor}
+              onChange={(e) => setRucProveedor(e.target.value)}
               required
             />
           </div>

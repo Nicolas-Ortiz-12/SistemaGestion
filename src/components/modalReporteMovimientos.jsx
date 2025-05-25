@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import styles from './modalReportes.module.css';
@@ -7,47 +7,80 @@ export default function ModalReporteMovimientos({ onClose }) {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   const [cuenta, setCuenta] = useState('');
+  const [cuentasDisponibles, setCuentasDisponibles] = useState([]);
 
-  const generarPDF = () => {
-  const doc = new jsPDF();
+  // Obtener todas las cuentas al cargar el componente
+  useEffect(() => {
+    const obtenerCuentas = async () => {
+      try {
+        const resp = await fetch('https://localhost:7149/api/Cuenta');
+        if (!resp.ok) throw new Error('Error al obtener cuentas');
+        const data = await resp.json();
+        setCuentasDisponibles(data);
+      } catch (error) {
+        console.error('Error al cargar cuentas:', error);
+      }
+    };
 
-  doc.setFontSize(16);
-  doc.text('REPORTE DE MOVIMIENTOS', 70, 15);
+    obtenerCuentas();
+  }, []);
 
-  doc.setFontSize(12);
-  doc.text(`Cuenta: ${cuenta || '123456788'}`, 14, 30);
-  doc.text(`Rango de fechas: ${fechaInicio} a ${fechaFin}`, 14, 38);
-
-  // Datos adicionales fijos para mostrar en el PDF
-  doc.text(`Titular: Ana González`, 14, 46);
-  doc.text(`Banco: Banco Familiar`, 14, 53);
-  doc.text(`Tipo de Cuenta: Ahorro`, 14, 60);
-  doc.text(`Moneda: Guaraníes (Gs)`, 14, 67);
-
-  const datosMuestra = [
-    ['2024-01-02', 'Compra en Tienda X', '500.000 Gs', cuenta || 'Cuenta 1'],
-    ['2024-01-05', 'Depósito Cliente', '1.000.000 Gs', cuenta || 'Cuenta 1'],
-    ['2024-01-10', 'Pago de servicio', '300.000 Gs', cuenta || 'Cuenta 2'],
-  ];
-
-  autoTable(doc, {
-    startY: 75,
-    head: [['Fecha', 'Descripción', 'Monto', 'Cuenta']],
-    body: datosMuestra,
-  });
-
-  doc.text('Total ingresos: 1.000.000 Gs', 14, doc.lastAutoTable.finalY + 10);
-  doc.text('Total egresos: 800.000 Gs', 14, doc.lastAutoTable.finalY + 18);
-  doc.text('Saldo final: 200.000 Gs', 14, doc.lastAutoTable.finalY + 26);
-
-  doc.output('dataurlnewwindow'); // Abre el PDF en nueva pestaña
-};
-
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    generarPDF(); // Generar el PDF de muestra
-    onClose();
+
+    try {
+      const resp = await fetch('https://localhost:7149/api/Movimiento');
+      if (!resp.ok) throw new Error('Error al obtener movimientos');
+      const data = await resp.json();
+
+      const filtrados = data.filter(m => {
+        const fechaValida =
+          (!fechaInicio || m.fecha >= fechaInicio) &&
+          (!fechaFin || m.fecha <= fechaFin);
+        const cuentaValida =
+          !cuenta || m.idCuenta === parseInt(cuenta);
+        return fechaValida && cuentaValida;
+      });
+
+      generarPDF(filtrados);
+      onClose();
+    } catch (error) {
+      console.error('Error al generar el reporte:', error);
+    }
+  };
+
+  const generarPDF = (datos) => {
+    const doc = new jsPDF();
+
+    const cuentaInfo = cuentasDisponibles.find(c => c.idCuenta === parseInt(cuenta));
+
+    doc.setFontSize(16);
+    doc.text('REPORTE DE MOVIMIENTOS', 70, 15);
+
+    doc.setFontSize(12);
+    doc.text(`Cuenta: ${cuentaInfo?.nroCuenta || '---'}`, 14, 30);
+    doc.text(`Titular: ${cuentaInfo?.nombre || '---'}`, 14, 37);
+    doc.text(`Tipo de Cuenta: ${cuentaInfo?.tCuenta || '---'}`, 14, 44);
+    doc.text(`Rango de fechas: ${fechaInicio || '---'} a ${fechaFin || '---'}`, 14, 51);
+    doc.text(`Moneda: Guaraníes (Gs)`, 14, 58);
+
+    const datosTabla = datos.map(m => [
+      m.fecha,
+      m.concepto,
+      `${m.monto.toLocaleString()} Gs`,
+      m.cuenta?.nroCuenta || '---'
+    ]);
+
+    autoTable(doc, {
+      startY: 70,
+      head: [['Fecha', 'Descripción', 'Monto', 'Cuenta']],
+      body: datosTabla
+    });
+
+    const total = datos.reduce((sum, m) => sum + m.monto, 0);
+    doc.text(`Total: ${total.toLocaleString()} Gs`, 14, doc.lastAutoTable.finalY + 10);
+
+    doc.output('dataurlnewwindow');
   };
 
   return (
@@ -77,13 +110,19 @@ export default function ModalReporteMovimientos({ onClose }) {
 
           <div>
             <label>Filtrar por cuenta (opcional):</label>
-            <input
-              type="text"
-              placeholder="Ej: Cuenta 1"
+            <select
               value={cuenta}
               onChange={(e) => setCuenta(e.target.value)}
-            />
+            >
+              <option value="">Todas las cuentas</option>
+              {cuentasDisponibles.map(c => (
+                <option key={c.idCuenta} value={c.idCuenta}>
+                  {c.nombre} - {c.nroCuenta}
+                </option>
+              ))}
+            </select>
           </div>
+          
 
           <button type="submit">Descargar Reporte</button>
         </form>
