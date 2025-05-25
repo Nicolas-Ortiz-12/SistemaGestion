@@ -7,8 +7,10 @@ export default function ModalReporteOrdenPago({ onClose }) {
     const [desde, setDesde] = useState('');
     const [hasta, setHasta] = useState('');
     const [proveedor, setProveedor] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const generarPDF = () => {
+    const generarPDF = (ordenes) => {
         const doc = new jsPDF();
 
         doc.setFontSize(16);
@@ -16,15 +18,16 @@ export default function ModalReporteOrdenPago({ onClose }) {
 
         doc.setFontSize(12);
         doc.text(`Desde: ${desde || '-'}    Hasta: ${hasta || '-'}`, 14, 30);
-        doc.text(`Proveedor: ${proveedor || '-'}`, 14, 38);
-
-        const data = [
-            ['123', '2024-07-01', 'Proveedor A', 'Gs. 5.000.000', 'Transferencia'],
-            ['124', '2024-07-03', 'Proveedor B', 'Gs. 2.700.000', 'Cheque'],
-            ['125', '2024-07-05', 'Proveedor A', 'Gs. 3.200.000', 'Transferencia'],
-        ];
+        doc.text(`Proveedor (RUC): ${proveedor || '-'}`, 14, 38);
 
         const columns = ['Nro Orden', 'Fecha', 'Proveedor', 'Total', 'Método'];
+        const data = ordenes.map(orden => {
+            const fecha = orden.movimiento?.fecha || '-';
+            const metodo = orden.movimiento?.metodoPago || '-';
+            const nombreProveedor = orden.facturas[0]?.proveedor?.nombre || '-';
+            const total = orden.facturas.reduce((sum, f) => sum + f.total, 0);
+            return [orden.nroOrden, fecha, nombreProveedor, `Gs. ${total.toLocaleString()}`, metodo];
+        });
 
         autoTable(doc, {
             head: [columns],
@@ -32,16 +35,32 @@ export default function ModalReporteOrdenPago({ onClose }) {
             startY: 45,
         });
 
-        // Abre el PDF en una nueva pestaña sin descargar
         const pdfUrl = doc.output('bloburl');
         window.open(pdfUrl, '_blank');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        generarPDF();
-        // Si querés cerrar el modal automáticamente, descomentá esta línea:
-        // onClose();
+        setError('');
+        if (!desde || !hasta || !proveedor) {
+            setError('Por favor complete todos los campos');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const url = `https://localhost:7149/api/OrdenDePago/por-fechas-ruc?fechaInicio=${desde}&fechaFin=${hasta}&ruc=${proveedor}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('No se encontraron datos o hubo un error en el servidor.');
+            }
+            const data = await response.json();
+            generarPDF(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -65,16 +84,19 @@ export default function ModalReporteOrdenPago({ onClose }) {
                         onChange={(e) => setHasta(e.target.value)}
                     />
 
-                    <label>Proveedor</label>
+                    <label>RUC del Proveedor</label>
                     <input
                         type="text"
                         name="proveedor"
-                        placeholder="Nombre o RUC"
+                        placeholder="RUC del proveedor"
                         value={proveedor}
                         onChange={(e) => setProveedor(e.target.value)}
                     />
 
-                    <button type="submit">Generar Reporte</button>
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Generando...' : 'Generar Reporte'}
+                    </button>
                 </form>
                 <button className={styles.closeButton} onClick={onClose}>Cerrar</button>
             </div>

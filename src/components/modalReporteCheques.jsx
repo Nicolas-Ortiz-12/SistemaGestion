@@ -8,43 +8,53 @@ export default function ModalReporteCheques({ onClose }) {
     const [fechaFin, setFechaFin] = useState('');
     const [estado, setEstado] = useState('');
 
-    const generarPDF = () => {
-        const doc = new jsPDF();
+    const generarPDF = async () => {
+        try {
+            const url = new URL('https://localhost:7149/api/Movimiento/cheques');
 
-        doc.setFontSize(16);
-        doc.text('REPORTE DE CHEQUES', 70, 15);
+            if (fechaInicio) url.searchParams.append('fechaInicio', fechaInicio);
+            if (fechaFin) url.searchParams.append('fechaFin', fechaFin);
+            if (estado) url.searchParams.append('estado', estado);
 
-        doc.setFontSize(12);
-        doc.text(`Rango de fechas: ${fechaInicio} a ${fechaFin}`, 14, 30);
-        doc.text(`Estado: ${estado || 'Todos'}`, 14, 38);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        let datos = [];
+            if (!response.ok) {
+                throw new Error(`Error al obtener los cheques: ${response.statusText}`);
+            }
 
-        const chequesEmitidos = [
-            ['2024-01-01', 'Cheque #001', '500.000 Gs', 'Emitido'],
-            ['2024-01-03', 'Cheque #002', '700.000 Gs', 'Emitido']
-        ];
+            const data = await response.json();
 
-        const chequesAnulados = [
-            ['2024-01-02', 'Cheque #003', '300.000 Gs', 'Anulado']
-        ];
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text('REPORTE DE CHEQUES', 70, 15);
 
-        const chequesConciliados = [
-            ['2024-01-04', 'Cheque #004', '800.000 Gs', 'Conciliado']
-        ];
+            doc.setFontSize(12);
+            doc.text(`Rango de fechas: ${fechaInicio} a ${fechaFin}`, 14, 30);
+            doc.text(`Estado: ${estado || 'Todos'}`, 14, 38);
 
-        if (estado === 'emitido') datos = chequesEmitidos;
-        else if (estado === 'anulado') datos = chequesAnulados;
-        else if (estado === 'conciliado') datos = chequesConciliados;
-        else datos = [...chequesEmitidos, ...chequesAnulados, ...chequesConciliados];
+            const tabla = data.map(cheque => ([
+                new Date(cheque.fecha).toLocaleDateString(), // convertir fecha
+                `Cheque #${cheque.idMovi}`,
+                `${cheque.monto.toLocaleString('es-PY')} Gs`,
+                cheque.estado
+            ]));
 
-        autoTable(doc, {
-            startY: 45,
-            head: [['Fecha', 'Cheque', 'Monto', 'Estado']],
-            body: datos
-        });
+            autoTable(doc, {
+                startY: 45,
+                head: [['Fecha', 'Cheque', 'Monto', 'Estado']],
+                body: tabla
+            });
 
-        doc.output('dataurlnewwindow');
+            doc.output('dataurlnewwindow');
+        } catch (error) {
+            console.error(error);
+            alert('Error al generar el PDF. Verifica los filtros y que el backend esté activo.');
+        }
     };
 
     const handleSubmit = (e) => {
@@ -59,17 +69,17 @@ export default function ModalReporteCheques({ onClose }) {
                 <h2 className={styles.modalTitle}>Reporte de Cheques</h2>
                 <form className={styles.conciliacionForm} onSubmit={handleSubmit}>
                     <label>Fecha Desde</label>
-                    <input type="date" name="desde" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
+                    <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
 
                     <label>Fecha Hasta</label>
-                    <input type="date" name="hasta" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
+                    <input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
 
                     <label>Estado del Cheque</label>
-                    <select name="estado" value={estado} onChange={(e) => setEstado(e.target.value)}>
+                    <select value={estado} onChange={(e) => setEstado(e.target.value)}>
                         <option value="">Todos</option>
-                        <option value="emitido">Emitido</option>
-                        <option value="conciliado">Conciliado</option>
-                        <option value="anulado">Anulado</option>
+                        <option value="Emitido">Emitido</option>
+                        <option value="Conciliado">Conciliado</option>
+                        <option value="Anulado">Anulado</option>
                     </select>
 
                     <button type="submit">Generar Reporte</button>
