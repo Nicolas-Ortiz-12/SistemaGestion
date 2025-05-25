@@ -1,16 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation , useNavigate} from 'react-router-dom';
 import styles from './sidebar.module.css';
 
 import proveedoresImg from '../img/icono1.png';
 import listaDeBancosImg from '../img/Banco.png';
 import ordenDePagoImg from '../img/OrdenDePago.png';
 import movimentosImg from '../img/Movimientos.png';
-import reportesImg from '../img/reportes.png'; 
+import reportesImg from '../img/reportes.png';
 
 export default function Sidebar() {
     const { pathname } = useLocation();
     const [activeIndex, setActiveIndex] = useState(0);
+    const navigate = useNavigate();
+    
+
+
+    const handleLogout = () => {
+        
+        localStorage.removeItem('token');
+        localStorage.removeItem('id');
+        
+        navigate('/');
+    };
 
     useEffect(() => {
         if (pathname.includes('listaDeBancos') || pathname.includes('movimientoBancarios')) {
@@ -89,7 +100,7 @@ export default function Sidebar() {
                 </ul>
             </nav>
 
-            <div className={styles.logout}>Cerrar Sesión</div>
+            <div className={styles.logout}  onClick={handleLogout} >Cerrar Sesión</div>
         </aside>
     );
 }
