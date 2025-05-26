@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/header';
 import styles from './reportes.module.css';
 import reportesImg from '../img/reportes.png';
-import ModalReporteBancos from '../components/modalReporteBancos';
+import ModalReporteFlujoCaja from '../components/modalReporteFlujoCaja';
 import ModalReporteProveedores from '../components/modalReporteProveedores';
 import ModalReporteMovimientos from '../components/modalReporteMovimientos';
 import ModalReporteCheques from '../components/modalReporteCheques';
@@ -15,7 +15,7 @@ export default function Reportes() {
 
     useEffect(() => {
         const datosEjemplo = [
-            { nombre: 'Reporte de Bancos', fecha: '2024-08-01', tipo: 'PDF' },
+            { nombre: 'Reporte de Caja', fecha: '2024-08-01', tipo: 'PDF' },
             { nombre: 'Reporte de Proveedores', fecha: '2024-08-03', tipo: 'PDF' },
             { nombre: 'Movimientos Bancarios', fecha: '2024-08-05', tipo: 'PDF' },
             { nombre: 'Reporte de Cheques', fecha: '2024-08-07', tipo: 'PDF' },
@@ -25,8 +25,8 @@ export default function Reportes() {
     }, []);
 
     const abrirModal = (nombre) => {
-        if (nombre.includes('Bancos') && !nombre.includes('Movimientos')) {
-            setModalAbierto('bancos');
+        if (nombre.includes('Caja') && !nombre.includes('Movimientos')) {
+            setModalAbierto('Caja');
         } else if (nombre.includes('Proveedores')) {
             setModalAbierto('proveedores');
         } else if (nombre.includes('Movimientos')) {
@@ -69,7 +69,7 @@ export default function Reportes() {
                     </table>
                 </div>
 
-                {modalAbierto === 'bancos' && <ModalReporteBancos onClose={() => setModalAbierto(null)} />}
+                {modalAbierto === 'Caja' && <ModalReporteFlujoCaja onClose={() => setModalAbierto(null)} />}
                 {modalAbierto === 'proveedores' && <ModalReporteProveedores onClose={() => setModalAbierto(null)} />}
                 {modalAbierto === 'movimientos' && <ModalReporteMovimientos onClose={() => setModalAbierto(null)} />}
                 {modalAbierto === 'cheques' && <ModalReporteCheques onClose={() => setModalAbierto(null)} />}
