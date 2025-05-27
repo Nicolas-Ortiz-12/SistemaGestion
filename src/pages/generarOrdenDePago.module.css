@@ -69,23 +69,55 @@ tr:nth-child(even) {
 }
 
 /* Botones de método de pago */
+/* Agrupación de botones */
 .buttonGroup {
     display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 1rem;
 }
 
+/* Estilos comunes a ambos botones */
 .btn {
-    padding: 10px 20px;
+    display: inline-flex;
+    /* <— para centrar texto perfectamente */
+    align-items: center;
+    /* <— */
+    justify-content: center;
+    /* <— */
+    white-space: nowrap;
+    /* <— evita que el texto se rompa en varias líneas */
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: 25px;
     font-size: 0.95rem;
-    font-weight: 100;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.15s ease;
+    min-width: 8rem;
+    /* <— ancho mínimo para que “Transferencia” quepa sin recortar */
 }
 
-.btnTransferencia,
-.btnCheques,
+/* Transferencia */
+.btnTransferencia {
+    background-color: #008DB1;
+    color: #fff;
+}
+
+.btnTransferencia:hover {
+    background-color: #007a99;
+    transform: translateY(-1px);
+}
+
+/* Cheque */
+.btnCheque {
+    background-color: #23adad;
+    color: #fff;
+}
+
+.btnCheque:hover {
+    background-color: #1f8b8b;
+    transform: translateY(-1px);
+}
+
 .btnGenerar {
     background-color: #008DB1;
     border: none;
@@ -101,7 +133,7 @@ tr:nth-child(even) {
 }
 
 /* Grupo de botones finales */
-.actions{
+.actions {
     margin-left: 4.5rem;
     display: flex;
     width: 90%;
@@ -109,7 +141,7 @@ tr:nth-child(even) {
     gap: 2rem;
 }
 
-.buttonGenerar{
+.buttonGenerar {
     background-color: #23adad;
     color: white;
     border: 0.5px solid #1f4f75;
@@ -119,7 +151,7 @@ tr:nth-child(even) {
     margin-top: 1.2rem;
 }
 
-.buttonVolver{
+.buttonVolver {
     background-color: #F2EFE7;
     color: black;
     border: 0.5px solid black;
@@ -137,11 +169,10 @@ tr:nth-child(even) {
 }
 
 .metodoContainer {
-    margin-left: 4.5rem;
     display: flex;
     align-items: center;
-    gap: 2rem;
-    margin-bottom: -1rem;
+    gap: 1.5rem;
+    margin: 2rem 4.5rem;
 }
 
 .metodoContainer button {
@@ -172,6 +203,52 @@ tr:nth-child(even) {
     width: 600px;
     border-radius: 4px;
     overflow: hidden;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: center;
+    /* centra ambos botones */
+    gap: 1rem;
+    /* separación homogénea */
+    padding: 1rem 0;
+}
+
+.modalActions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    min-width: 6rem;
+}
+
+/* Botón Guardar (primario) */
+.btnGuardar {
+    background-color: #23adad;
+    color: #fff;
+}
+
+.btnGuardar:hover {
+    background-color: #1f8b8b;
+    transform: translateY(-1px);
+}
+
+/* Botón Cancelar (secundario) */
+.btnCancelar {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.btnCancelar:hover {
+    background-color: #cfcfcf;
+    transform: translateY(-1px);
 }
 
 .modalHeader {

@@ -45,21 +45,21 @@ export default function GenerarOrdenDePago() {
     const [proveedor] = useState(proveedorInicial);
     const [nroPago, setNroPago] = useState('');
     useEffect(() => {
-    const fetchUltimoNumero = async () => {
-        try {
-            const res = await fetch('https://localhost:7149/api/OrdenDePago/ultimo-nro');
-            if (!res.ok) throw new Error();
-            const numeroActual = await res.text(); 
-            const siguiente = parseInt(numeroActual) + 1;
-            setNroPago(siguiente.toString().padStart(6, '0')); 
-        } catch (error) {
-            console.error("Error al obtener el número de orden:", error);
-            alert("No se pudo obtener el número de orden");
-        }
-    };
+        const fetchUltimoNumero = async () => {
+            try {
+                const res = await fetch('https://localhost:7149/api/OrdenDePago/ultimo-nro');
+                if (!res.ok) throw new Error();
+                const numeroActual = await res.text();
+                const siguiente = parseInt(numeroActual) + 1;
+                setNroPago(siguiente.toString().padStart(6, '0'));
+            } catch (error) {
+                console.error("Error al obtener el número de orden:", error);
+                alert("No se pudo obtener el número de orden");
+            }
+        };
 
-    fetchUltimoNumero();
-}, []);
+        fetchUltimoNumero();
+    }, []);
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
     const [importeTotal, setImporteTotal] = useState(
         facturas.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
@@ -261,17 +261,23 @@ export default function GenerarOrdenDePago() {
                 </table>
 
                 {/* Métodos de pago */}
+                + {/* Métodos de pago */}
                 <div className={styles.metodoContainer}>
-                    <h2>Método De Pago</h2>
-                    <button
-                        onClick={() => openModal('transferencia')}
-                        className={styles.btn}
-                    >
-                        Transferencia
-                    </button>
-                    <button onClick={() => openModal('cheque')} className={styles.btn}>
-                        Cheque
-                    </button>
+                    <h2 className={styles.metodoTitle}>Método de Pago:</h2>
+                    <div className={styles.buttonGroup}>
+                        <button
+                            onClick={() => openModal('transferencia')}
+                            className={`${styles.btn} ${styles.btnTransferencia}`}
+                        >
+                            Transferencia
+                        </button>
+                        <button
+                            onClick={() => openModal('cheque')}
+                            className={`${styles.btn} ${styles.btnCheque}`}
+                        >
+                            Cheque
+                        </button>
+                    </div>
                 </div>
 
                 {/* Modal Crear/Editar */}
@@ -309,8 +315,8 @@ export default function GenerarOrdenDePago() {
                                     </select>
                                 </div>
                                 <div className={styles.modalActions}>
-                                    <button className={styles.btn} onClick={saveMovimiento}>Guardar</button>
-                                    <button className={styles.btnCancelar} onClick={closeModal}>Cancelar</button>
+                                    <button className={`${styles.btn} ${styles.btnGuardar}`} onClick={saveMovimiento}>Guardar</button>
+                                    <button className={`${styles.btn} ${styles.btnCancelar}`} onClick={closeModal}>Cancelar</button>
                                 </div>
                             </div>
                         </div>
@@ -351,8 +357,18 @@ export default function GenerarOrdenDePago() {
 
                 {/* Generar orden */}
                 <div className={styles.actions}>
-                    <button onClick={() => navigate(-1)}>Volver</button>
-                    <button onClick={generarOrden}>Generar Orden</button>
+                    <button
+                        onClick={() => navigate(-1)}
+                        className={styles.buttonVolver}
+                    >
+                        Volver
+                    </button>
+                    <button
+                        onClick={generarOrden}
+                        className={styles.buttonGenerar}
+                    >
+                        Generar Orden
+                    </button>
                 </div>
             </main>
         </div>
