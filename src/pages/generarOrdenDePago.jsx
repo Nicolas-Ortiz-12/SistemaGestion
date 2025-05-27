@@ -44,6 +44,22 @@ export default function GenerarOrdenDePago() {
 
     const [proveedor] = useState(proveedorInicial);
     const [nroPago, setNroPago] = useState('');
+    useEffect(() => {
+    const fetchUltimoNumero = async () => {
+        try {
+            const res = await fetch('https://localhost:7149/api/OrdenDePago/ultimo-nro');
+            if (!res.ok) throw new Error();
+            const numeroActual = await res.text(); 
+            const siguiente = parseInt(numeroActual) + 1;
+            setNroPago(siguiente.toString().padStart(6, '0')); 
+        } catch (error) {
+            console.error("Error al obtener el número de orden:", error);
+            alert("No se pudo obtener el número de orden");
+        }
+    };
+
+    fetchUltimoNumero();
+}, []);
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
     const [importeTotal, setImporteTotal] = useState(
         facturas.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
@@ -171,9 +187,10 @@ export default function GenerarOrdenDePago() {
         }
         const dto = {
             NroOrden: nroPago,
-            MovimientoIds: movimientos.map(m => m.idMovi),
+            IdMovi: movimientos[0]?.idMovi,
             FacturaIds: facturas.map(f => f.id_factura)
         };
+        console.log('Enviando DTO:', dto);
         try {
             const res = await fetch('https://localhost:7149/api/OrdenDePago', {
                 method: 'POST',
@@ -183,7 +200,7 @@ export default function GenerarOrdenDePago() {
             if (!res.ok) throw new Error();
             const orden = await res.json();
             alert(`Orden ${orden.idOrden} generada`);
-            navigate(`/ordenes/${orden.idOrden}`);
+            navigate(`/ordenDePago`);
         } catch {
             alert('No se pudo generar la orden.');
         }
@@ -202,7 +219,7 @@ export default function GenerarOrdenDePago() {
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Nro. Pago</label>
-                        <input value={nroPago} onChange={e => setNroPago(e.target.value)} />
+                        <input value={nroPago} disabled />
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Fecha</label>

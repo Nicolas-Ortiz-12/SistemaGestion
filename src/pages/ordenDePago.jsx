@@ -36,7 +36,8 @@ export default function OrdenDePago() {
                 const fecha = new Date(fac.fecha_exp);
                 const desde = fechaDesde ? new Date(fechaDesde) : null;
                 const hasta = fechaHasta ? new Date(fechaHasta) : null;
-                return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
+                const pendiente = fac.saldo > 0;
+                return pendiente && (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
             });
 
             setFacturas(data);
