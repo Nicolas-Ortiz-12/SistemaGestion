@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from '../components/modalMovimientos.module.css';
 import AgregarTipoTransaccion from '../components/AgregarTipoTransaccion';
 
-export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
+export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave }) {
     const [tipoTransaccion, setTipoTransaccion] = useState('');
     const [tiposTransaccion, setTiposTransaccion] = useState([]);
     const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10));
@@ -12,6 +12,22 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
     const [concepto, setConcepto] = useState('');
     const [motivo, setMotivo] = useState('');
     const [showAgregarTipo, setShowAgregarTipo] = useState(false);
+
+    // Función para resetear el formulario a valores iniciales
+    const resetForm = () => {
+        setTipoTransaccion('');
+        setFecha(new Date().toISOString().slice(0, 10));
+        setMonto('');
+        setCuentaDestino('');
+        setBeneficiario('');
+        setConcepto('');
+        setMotivo('');
+        setShowAgregarTipo(false);
+    };
+    
+    useEffect(() => {
+        if (isOpen) resetForm();
+    }, [isOpen]);
 
     useEffect(() => {
         async function fetchTipos() {
@@ -62,8 +78,8 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId }) {
                 body: formData
             });
             if (!resp.ok) throw new Error(`Error ${resp.status}: No se guardó el movimiento`);
-            console.log('Movimiento guardado correctamente');
-            window.location.reload();
+            const savedMov = await resp.json();
+            onSave(savedMov);
             onClose();
         } catch (error) {
             console.error('Error al guardar Movimiento:', error);

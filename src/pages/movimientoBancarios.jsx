@@ -146,18 +146,40 @@ export default function MovimientosBancarios() {
             setConcSaldoAct(0)
             fetchConciliaciones()
 
+            fetchCuenta()
+
+            fetchMovimientos()
+
         } catch (err) {
             alert(`Error: ${err.message}`)
         }
     }
 
     const handleSaveMovimiento = savedMov => {
-        if (savedMov.transaccion.tipoMov === 'Cheque' || savedMov.transaccion.nombre.toLowerCase().includes('cheque')) {
-            savedMov.estado = 'Pendiente'
+        const monto = savedMov.monto
+        const isDebit = savedMov.transaccion.tipoMov === 'D'
+        const isCheque = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque'
+
+        setCuenta(prev => ({
+            ...prev,
+            saldo: isDebit
+                ? (isCheque
+                    // CHEQUE: no restamos aún
+                    ? prev.saldo
+                    // DÉBITO normal: restamos
+                    : prev.saldo - monto)
+                // CRÉDITO: sumamos siempre
+                : prev.saldo + monto
+        }))
+
+        // Estado “Emitido” para cheques pendientes
+        if (isCheque) {
+            savedMov.estado = 'Emitido'
         }
+
+        // Insertamos en la lista
         setMovimientos(prev => [savedMov, ...prev])
         setCurrentPage(1)
-        fetchCuenta()
     }
 
     const startMov = (currentPage - 1) * itemsPerPageMov
@@ -198,7 +220,7 @@ export default function MovimientosBancarios() {
                                 SALDO TOTAL<br />DE LA CUENTA
                             </div>
                             <div className={styles.balanceAmount}>
-                                {errorCuenta ? '—' : state.account.saldo.toLocaleString('es-PY') + '₲'}
+                                {errorCuenta ? '—' : cuenta.saldo.toLocaleString('es-PY') + '₲'}
                             </div>
                         </div>
 
@@ -258,7 +280,7 @@ export default function MovimientosBancarios() {
                                     onChange={e => setConcFecha(e.target.value)}
                                 />
                             </div>
-                        
+
                             <div>
                                 <label>Saldo 2do Edo. Cta:</label>
                                 <input
