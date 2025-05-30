@@ -6,6 +6,7 @@ import TabSelector from '../components/tab.jsx'
 import Pagination from '../components/pagination.jsx'
 import ModalMovimiento from "../components/modalMovimientos.jsx"
 import styles from '../pages/movimientosBancarios.module.css'
+import ChequeDetailModal from '../components/DetalleMovimiento.jsx'
 
 export default function MovimientosBancarios() {
     const { state } = useLocation()
@@ -32,10 +33,11 @@ export default function MovimientosBancarios() {
     const itemsPerPageCon = 10
 
     const [concFecha, setConcFecha] = useState(new Date().toISOString().slice(0, 10))
-    const [concSaldoAnt, setConcSaldoAnt] = useState('')
     const [concSaldo2do, setConcSaldo2do] = useState('')
     const [concSaldoAct, setConcSaldoAct] = useState(0)
     const [selectedConcMovs, setSelectedConcMovs] = useState([])
+    const [detalleMov, setDetalleMov] = useState(null)
+    const [isDetalleOpen, setDetalleOpen] = useState(false)
 
     const [isModalOpen, setModalOpen] = useState(false)
 
@@ -44,9 +46,11 @@ export default function MovimientosBancarios() {
     const fetchMovimientos = async () => {
         setErrorMov(null)
         try {
-            const resp = await fetch(
-                `https://localhost:7149/api/Movimiento/cuenta/${state.account.idCuenta}`
-            )
+            // 1) Expirar cheques en backend
+            await fetch('https://localhost:7149/api/Movimiento/expirar-cheques', { method: 'PUT' })
+
+            // 2) Cargar movimientos actualizados
+            const resp = await fetch(`https://localhost:7149/api/Movimiento/cuenta/${state.account.idCuenta}`)
             if (!resp.ok) throw new Error('Error al cargar movimientos')
             const data = await resp.json()
             setMovimientos(data)
@@ -79,13 +83,14 @@ export default function MovimientosBancarios() {
         }
     }
 
+    // Al cambiar pestaña a "movimientos", expirar y cargar movimientos
     useEffect(() => {
-        if (activeTab === 'movimientos') fetchMovimientos()
+        if (activeTab === 'movimientos') {
+            fetchMovimientos()
+        }
     }, [activeTab, state.account.id])
 
-    useEffect(() => {
-        fetchCuenta()
-    }, [state.account.idCuenta])
+    useEffect(() => { fetchCuenta() }, [state.account.idCuenta])
 
     useEffect(() => {
         if (activeTab === 'conciliaciones') fetchConciliaciones()
@@ -97,59 +102,37 @@ export default function MovimientosBancarios() {
     }, [selectedConcMovs])
 
     const handleSelectConc = (mov, checked) => {
-        if (checked) {
-            setSelectedConcMovs(prev => [...prev, mov])
-        } else {
-            setSelectedConcMovs(prev => prev.filter(m => m.idMovi !== mov.idMovi))
-        }
+        setSelectedConcMovs(prev =>
+            checked ? [...prev, mov] : prev.filter(m => m.idMovi !== mov.idMovi)
+        )
     }
 
     const handleConciliar = async () => {
         const saldo2 = parseFloat(concSaldo2do)
-        if (isNaN(saldo2)) {
-            alert('Ingrese un valor numérico en Saldo 2do Edo. Cta.')
-            return
-        }
-
-        if (saldo2 !== concSaldoAct) {
-            alert('El Saldo 2do Edo. Cta debe ser igual al Saldo Actual para conciliar')
-            return
-        }
+        if (isNaN(saldo2)) return alert('Ingrese un valor numérico en Saldo 2do Edo. Cta.')
+        if (saldo2 !== concSaldoAct) return alert('Saldo 2do debe igualar Saldo Actual')
 
         const payload = {
             cuentaId: state.account.idCuenta,
             fechaConciliacion: concFecha,
             movimientos: selectedConcMovs.map(m => m.idMovi)
         }
-        console.log('Payload:', payload)
 
         try {
             const resp = await fetch('https://localhost:7149/api/Movimiento/conciliar', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             })
-
             if (!resp.ok) {
-                const errorText = await resp.text()
-                throw new Error(`Error al conciliar: ${errorText}`)
+                const text = await resp.text()
+                throw new Error(text)
             }
 
-            alert('Conciliación realizada con éxito.')
-
-            // Limpiar formulario y recargar conciliaciones
             setSelectedConcMovs([])
-            setConcSaldoAnt('')
             setConcSaldo2do('')
             setConcSaldoAct(0)
             fetchConciliaciones()
-
             fetchCuenta()
-
             fetchMovimientos()
-
         } catch (err) {
             alert(`Error: ${err.message}`)
         }
@@ -160,28 +143,28 @@ export default function MovimientosBancarios() {
         const isDebit = savedMov.transaccion.tipoMov === 'D'
         const isCheque = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque'
 
-        setCuenta(prev => ({
-            ...prev,
-            saldo: isDebit
-                ? (isCheque
-                    // CHEQUE: no restamos aún
-                    ? prev.saldo
-                    // DÉBITO normal: restamos
-                    : prev.saldo - monto)
-                // CRÉDITO: sumamos siempre
-                : prev.saldo + monto
-        }))
+        const isChequeDeposito = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque deposito';
+        const estadoEmitido = savedMov.estado.toLowerCase() === 'emitido';
 
-        // Estado “Emitido” para cheques pendientes
-        if (isCheque) {
-            savedMov.estado = 'Emitido'
-        }
+        setCuenta(prev => {
+            // No afectar el saldo si es Cheque Depósito Emitido
+            if (isChequeDeposito && estadoEmitido) return prev;
 
-        // Insertamos en la lista
+            return {
+                ...prev,
+                saldo: isDebit
+                    ? (isCheque ? prev.saldo : prev.saldo - monto)
+                    : prev.saldo + monto
+            };
+        });
+
+
+        if (isCheque) savedMov.estado = 'Emitido'
         setMovimientos(prev => [savedMov, ...prev])
         setCurrentPage(1)
     }
 
+    // Paginación
     const startMov = (currentPage - 1) * itemsPerPageMov
     const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
     const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
@@ -205,6 +188,11 @@ export default function MovimientosBancarios() {
                     accountId={state.account.idCuenta}
                     onSave={handleSaveMovimiento}
                 />
+                <ChequeDetailModal
+                    isOpen={isDetalleOpen}
+                    onClose={() => setDetalleOpen(false)}
+                    movimiento={detalleMov}
+                />
 
                 <div className={styles.tabs}>
                     <TabSelector
@@ -216,30 +204,20 @@ export default function MovimientosBancarios() {
                 {activeTab === 'movimientos' && (
                     <>
                         <div className={styles.balanceCard}>
-                            <div className={styles.balanceTitle}>
-                                SALDO TOTAL<br />DE LA CUENTA
-                            </div>
+                            <div className={styles.balanceTitle}>SALDO TOTAL<br />DE LA CUENTA</div>
                             <div className={styles.balanceAmount}>
-                                {errorCuenta ? '—' : cuenta.saldo.toLocaleString('es-PY') + '₲'}
+                                {errorCuenta ? '—' : `${cuenta.saldo.toLocaleString('es-PY')}₲`}
                             </div>
                         </div>
-
                         <h2 className={styles.sectionTitle}>Últimos Movimientos Bancarios</h2>
-
                         {errorMov && <p className={styles.error}>{errorMov}</p>}
-
                         {!errorMov && (
                             <>
                                 <table className={styles.table}>
                                     <thead>
                                         <tr>
-                                            <th>Concepto</th>
-                                            <th>Fecha</th>
-                                            <th>Debe</th>
-                                            <th>Haber</th>
-                                            <th>Transacción</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
+                                            <th>Concepto</th><th>Fecha</th><th>Debe</th><th>Haber</th>
+                                            <th>Transacción</th><th>Estado</th><th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -250,15 +228,22 @@ export default function MovimientosBancarios() {
                                                 <td>{m.transaccion.tipoMov === 'D' ? m.monto.toLocaleString('es-PY') : ''}</td>
                                                 <td>{m.transaccion.tipoMov === 'C' ? m.monto.toLocaleString('es-PY') : ''}</td>
                                                 <td>{m.transaccion.nombre.trim()}</td>
-                                                <td>{m.estado}</td>
-                                                <td>
-                                                    <button className={styles.actionBtn}>📋</button>
+                                                <td style={{ color: m.estado === 'Expirado' ? 'red' : 'inherit' }}>
+                                                    {m.estado}
                                                 </td>
+                                                <td><button
+                                                        className={styles.actionBtn}
+                                                        onClick={() => {
+                                                            setDetalleMov(m)
+                                                            setDetalleOpen(true)
+                                                        }}
+                                                    >
+                                                        📋
+                                                    </button></td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-
                                 <Pagination
                                     currentPage={currentPage}
                                     totalPages={totalPagesMov}
@@ -280,7 +265,6 @@ export default function MovimientosBancarios() {
                                     onChange={e => setConcFecha(e.target.value)}
                                 />
                             </div>
-
                             <div>
                                 <label>Saldo 2do Edo. Cta:</label>
                                 <input
@@ -301,22 +285,15 @@ export default function MovimientosBancarios() {
                             </div>
                             <button onClick={handleConciliar}>Conciliar</button>
                         </div>
-
                         <h2 className={styles.sectionTitle}>Pendientes de Conciliación</h2>
-
                         {errorConc && <p className={styles.error}>{errorConc}</p>}
-
                         {!errorConc && (
                             <>
                                 <table className={styles.table}>
                                     <thead>
                                         <tr>
-                                            <th>REFERENCIA</th>
-                                            <th></th>
-                                            <th>FECHA EMISIÓN</th>
-                                            <th>FECHA CONCILIACIÓN</th>
-                                            <th>MONTO</th>
-                                            <th>ESTADO</th>
+                                            <th>REFERENCIA</th><th></th><th>FECHA EMISIÓN</th>
+                                            <th>FECHA CONCILIACIÓN</th><th>MONTO</th><th>ESTADO</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -331,14 +308,15 @@ export default function MovimientosBancarios() {
                                                     />
                                                 </td>
                                                 <td>{formatDate(c.fecha)}</td>
-                                                <td>{formatDate(c.fechaConciliacion) || '—'}</td>
+                                                <td>{c.fechaConciliacion ? formatDate(c.fechaConciliacion) : '—'}</td>
                                                 <td>{c.monto.toLocaleString('es-PY')}</td>
-                                                <td>{c.estado}</td>
+                                                <td style={{ color: c.estado === 'Expirado' ? 'red' : 'inherit' }}>
+                                                    {c.estado}
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-
                                 <Pagination
                                     currentPage={currentPage}
                                     totalPages={totalPagesCon}

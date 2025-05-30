@@ -98,7 +98,7 @@ tr:nth-child(even) {
 
 /* Transferencia */
 .btnTransferencia {
-    background-color: #008DB1;
+    background-color: #006f8c;
     color: #fff;
 }
 
@@ -109,17 +109,17 @@ tr:nth-child(even) {
 
 /* Cheque */
 .btnCheque {
-    background-color: #23adad;
+    background-color: #1f8b8b;
     color: #fff;
 }
 
 .btnCheque:hover {
-    background-color: #1f8b8b;
+    background-color: #a5d6c8;
     transform: translateY(-1px);
 }
 
 .btnGenerar {
-    background-color: #008DB1;
+    background-color: #1f8b8b;
     border: none;
     cursor: pointer;
     border-radius: 5px;
@@ -142,7 +142,7 @@ tr:nth-child(even) {
 }
 
 .buttonGenerar {
-    background-color: #23adad;
+    background-color: #1f8b8b;
     color: white;
     border: 0.5px solid #1f4f75;
     padding: 12.5px 18px;
@@ -231,7 +231,7 @@ tr:nth-child(even) {
 
 /* Botón Guardar (primario) */
 .btnGuardar {
-    background-color: #23adad;
+    background-color: #006f8c;
     color: #fff;
 }
 

@@ -142,7 +142,6 @@ export default function GenerarOrdenDePago() {
                 res = await fetch(`https://localhost:7149/api/Movimiento/${modalFields.IdMovi}`, {
                     method: 'PUT',
                     body: formData
-                    // 👇 No pongas 'Content-Type', el navegador lo hace por ti con FormData
                 });
                 if (!res.ok) throw new Error();
                 data = { ...modalFields };
@@ -259,9 +258,6 @@ export default function GenerarOrdenDePago() {
                         ))}
                     </tbody>
                 </table>
-
-                {/* Métodos de pago */}
-                + {/* Métodos de pago */}
                 <div className={styles.metodoContainer}>
                     <h2 className={styles.metodoTitle}>Método de Pago:</h2>
                     <div className={styles.buttonGroup}>

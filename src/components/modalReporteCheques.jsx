@@ -79,7 +79,7 @@ export default function ModalReporteCheques({ onClose }) {
                         <option value="">Todos</option>
                         <option value="Emitido">Emitido</option>
                         <option value="Conciliado">Conciliado</option>
-                        <option value="Anulado">Anulado</option>
+                        <option value="Expirado">Expirado</option>
                     </select>
 
                     <button type="submit">Generar Reporte</button>

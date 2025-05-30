@@ -12,8 +12,9 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
     const [concepto, setConcepto] = useState('');
     const [motivo, setMotivo] = useState('');
     const [showAgregarTipo, setShowAgregarTipo] = useState(false);
+    const [bancos, setBancos] = useState([]);
+    const [bancoEmisor, setBancoEmisor] = useState('');
 
-    // Función para resetear el formulario a valores iniciales
     const resetForm = () => {
         setTipoTransaccion('');
         setFecha(new Date().toISOString().slice(0, 10));
@@ -22,9 +23,10 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
         setBeneficiario('');
         setConcepto('');
         setMotivo('');
+        setBancoEmisor('');
         setShowAgregarTipo(false);
     };
-    
+
     useEffect(() => {
         if (isOpen) resetForm();
     }, [isOpen]);
@@ -43,6 +45,20 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
         fetchTipos();
     }, []);
 
+    useEffect(() => {
+        async function fetchBancos() {
+            try {
+                const resp = await fetch('https://localhost:7149/api/Banco');
+                if (!resp.ok) throw new Error('Error al obtener bancos');
+                const data = await resp.json();
+                setBancos(data);
+            } catch (err) {
+                console.error('Error al cargar bancos:', err);
+            }
+        }
+        fetchBancos();
+    }, []);
+
     const formatearMonto = (valor) => {
         const soloNumeros = valor.replace(/\D/g, '');
         return soloNumeros.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -57,7 +73,23 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
     const handleSave = async () => {
         const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
         const nombreTipo = seleccion?.nombre;
-        const estado = nombreTipo === 'Cheque' ? 'Emitido' : 'Activo';
+        let estado = nombreTipo === 'Cheque' ? 'Emitido' : 'Activo';
+
+        if (nombreTipo === 'Cheque Deposito') {
+            try {
+                const cuentaOrigenResp = await fetch(`https://localhost:7149/api/Cuenta/${accountId}`);
+                if (!cuentaOrigenResp.ok) throw new Error('Error al obtener cuenta');
+                const cuentaOrigen = await cuentaOrigenResp.json();
+                
+                const mismoBanco = cuentaOrigen.banco.nombre === bancoEmisor;
+                estado = mismoBanco ? 'Activo' : 'Emitido';
+            } catch (err) {
+                console.error('Error al validar banco:', err);
+                estado = 'Emitido';
+            }
+        }
+
+
 
         const montoNumerico = monto.replace(/\./g, '');
 
@@ -162,6 +194,25 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
                                         value={cuentaDestino}
                                         onChange={e => setCuentaDestino(e.target.value)}
                                     />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Banco Emisor para Cheque Depósito */}
+                        {nombreTipo === 'Cheque Deposito' && (
+                            <div className={styles.row}>
+                                <div className={styles.field}>
+                                    <label>Banco emisor del cheque</label>
+                                    <select
+                                        className={styles.select}
+                                        value={bancoEmisor}
+                                        onChange={e => setBancoEmisor(e.target.value)}
+                                    >
+                                        <option value="">Seleccione un banco</option>
+                                        {bancos.map(b => (
+                                            <option key={b.id} value={b.nombre}>{b.nombre}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                         )}
