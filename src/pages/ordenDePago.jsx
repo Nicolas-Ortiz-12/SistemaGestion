@@ -19,6 +19,7 @@ export default function OrdenDePago() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentFacturas = facturasFiltradas.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(facturasFiltradas.length / itemsPerPage);
+    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-PY')
 
     const handleBuscar = async (e) => {
         e.preventDefault();
@@ -130,7 +131,7 @@ export default function OrdenDePago() {
                             return (
                                 <tr key={fac.id || globalIndex}>
                                     <td>{fac.proveedor?.nombre}</td>
-                                    <td>{fac.fecha_exp}</td>
+                                    <td>{formatDate(fac.fecha_exp)}</td>
                                     <td>{fac.nro_factura}</td>
                                     <td>{fac.total}</td>
                                     <td>{fac.saldo}</td>

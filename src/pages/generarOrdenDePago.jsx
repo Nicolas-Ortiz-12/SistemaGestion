@@ -9,6 +9,8 @@ export default function GenerarOrdenDePago() {
     const facturas = location.state?.facturas || [];
     const proveedorInicial = location.state?.proveedor || '';
     const [cuentas, setCuentas] = useState([]);
+
+    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-PY')
     useEffect(() => {
         const fetchCuentas = async () => {
             try {
@@ -249,7 +251,7 @@ export default function GenerarOrdenDePago() {
                     <tbody>
                         {facturas.map((f, i) => (
                             <tr key={i}>
-                                <td>{f.fecha_exp}</td>
+                                <td>{formatDate(f.fecha_exp)}</td>
                                 <td>{f.nro_factura}</td>
                                 <td>{f.total}</td>
                                 <td>{f.saldo}</td>
@@ -336,7 +338,7 @@ export default function GenerarOrdenDePago() {
                             .filter(m => m.estado === 'pendiente')
                             .map(m => (
                                 <tr key={m.idMovi}>
-                                    <td>{m.fecha}</td>
+                                    <td>{formatDate(m.fecha)}</td>
                                     <td>{m.monto}</td>
                                     <td>{cuentas.find(c => c.idCuenta === Number(m.idCuenta))?.nroCuenta || '(sin cuenta)'}</td>
                                     <td>{m.concepto}</td>

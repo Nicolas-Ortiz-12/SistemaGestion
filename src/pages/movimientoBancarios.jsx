@@ -41,7 +41,19 @@ export default function MovimientosBancarios() {
 
     const [isModalOpen, setModalOpen] = useState(false)
 
-    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-ES')
+    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-PY')
+
+    const formatearMonto = (valor) => {
+        const soloNumeros = valor.replace(/\D/g, '');
+        return soloNumeros.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
+    const handleMontoChange = (e) => {
+        const valor = e.target.value;
+        const formateado = formatearMonto(valor);
+        setConcSaldo2do(formateado);
+    };
+    
 
     const fetchMovimientos = async () => {
         setErrorMov(null)
@@ -108,9 +120,10 @@ export default function MovimientosBancarios() {
     }
 
     const handleConciliar = async () => {
-        const saldo2 = parseFloat(concSaldo2do)
+        const saldo2 = parseFloat(concSaldo2do.replace(/\./g, "").replace(",", "."));
         if (isNaN(saldo2)) return alert('Ingrese un valor numérico en Saldo 2do Edo. Cta.')
         if (saldo2 !== concSaldoAct) return alert('Saldo 2do debe igualar Saldo Actual')
+
 
         const payload = {
             cuentaId: state.account.idCuenta,
@@ -176,7 +189,7 @@ export default function MovimientosBancarios() {
     return (
         <div className={styles.container}>
             <main className={styles.main}>
-                <Header title={`${state.bank.nombre} – ${state.account.tCuenta}`}>
+                <Header title={`${state.bank.nombre} – ${state.account.tCuenta} - ${state.account.nroCuenta} `}>
                     <button onClick={() => setModalOpen(true)}>
                         <img src={agregarMovimientoImg} width={70} alt="Agregar movimiento" />
                     </button>
@@ -270,7 +283,7 @@ export default function MovimientosBancarios() {
                                 <input
                                     type="text"
                                     value={concSaldo2do}
-                                    onChange={e => setConcSaldo2do(e.target.value)}
+                                    onChange={handleMontoChange}
                                     placeholder="0.00"
                                 />
                             </div>

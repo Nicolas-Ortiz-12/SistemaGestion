@@ -13,6 +13,8 @@ export default function Reportes() {
     const [reportes, setReportes] = useState([]);
     const [modalAbierto, setModalAbierto] = useState(null);
 
+    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-PY')
+
     useEffect(() => {
         const datosEjemplo = [
             { nombre: 'Reporte de Caja', fecha: '2024-08-01', tipo: 'PDF' },
@@ -58,7 +60,7 @@ export default function Reportes() {
                             {reportes.map((r, index) => (
                                 <tr key={index}>
                                     <td>{r.nombre}</td>
-                                    <td>{r.fecha}</td>
+                                    <td>{formatDate(r.fecha)}</td>
                                     <td>{r.tipo}</td>
                                     <td>
                                         <button onClick={() => abrirModal(r.nombre)} className={styles.boton}>Generar</button>

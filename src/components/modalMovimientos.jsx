@@ -69,6 +69,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
         const formateado = formatearMonto(valor);
         setMonto(formateado);
     };
+    
 
     const handleSave = async () => {
         const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
