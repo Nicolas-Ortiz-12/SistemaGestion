@@ -8,7 +8,8 @@ import OrdenDePago from './pages/ordenDePago.jsx';
 import PantallaConSidebar from './components/pantallaConSidebar.jsx';
 import GenerarOrdenDePago from "./pages/generarOrdenDePago.jsx";
 import Reportes from './pages/reportes.jsx'; 
-import ProtectedRoute from './components/ProtectedRoute.jsx'; // <- Asegurate de importar
+import ProtectedRoute from './components/ProtectedRoute.jsx'; 
+import Asiento from './pages/Asiento.jsx';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="proveedores" element={<Proveedores />} />
             <Route path="ordenDePago" element={<OrdenDePago />} />
             <Route path="reportes" element={<Reportes />} />
+            <Route path="asiento" element={<Asiento />} />
           </Route>
         </Route>
       </Routes>

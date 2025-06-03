@@ -1,0 +1,96 @@
+.asientoHeaderContainer {
+    background-color: #1e4e79;
+    padding: 1.2rem;
+    text-align: center;
+   
+    margin-bottom: 1.5rem;
+}
+
+.asientoHeaderTitle {
+    margin: 0;
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 100;
+}
+
+.asientoWrapper {
+    max-width: 900px;
+    margin-bottom: 2rem;
+    margin-left: 2rem;
+}
+
+.asientoTable {
+    width: 90%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 0 0.3em rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    margin: 0 auto 1rem auto; 
+}
+
+.asientoTable th,
+.asientoTable td {
+    padding: 8px 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.asientoTable th {
+    background-color:#006784;
+    color: white;
+}
+
+.asientoHeader {
+    background-color: #1e4e79;
+    color: white;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+}
+
+.asientoSub {
+    padding: 0.4rem 1rem;
+    background-color: #f1f1f1;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #ccc;
+}
+
+.totalesRow {
+    background-color: #e1f0e4;
+    font-weight: bold;
+}
+
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem auto;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+}
+
+.paginacion button {
+    padding: 0.4rem 0.8rem;
+    background-color: #1e4e79;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.paginacion button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+.asientoTable tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+
+.asientoTable tr:nth-child(even) {
+    background-color: #eaeaea;
+}

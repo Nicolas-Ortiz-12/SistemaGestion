@@ -60,7 +60,7 @@ export default function ModalReporteFlujoCaja({ onClose }) {
       const doc = new jsPDF();
 
       doc.setFontSize(16);
-      doc.text('REPORTE DE FLUJO DE CAJA', 60, 15);
+      doc.text('REPORTE DE FLUJO DE CUENTA', 60, 15);
 
       doc.setFontSize(12);
       doc.text(`Desde: ${desde || '-'}     Hasta: ${hasta || '-'}`, 14, 30);
@@ -91,7 +91,7 @@ export default function ModalReporteFlujoCaja({ onClose }) {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2 className={styles.modalTitle}>Reporte de Flujo de Caja</h2>
+        <h2 className={styles.modalTitle}>Reporte de Flujo de Cuenta</h2>
         <form className={styles.conciliacionForm} onSubmit={handleSubmit}>
           <label>Fecha Desde</label>
           <input

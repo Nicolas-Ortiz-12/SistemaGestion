@@ -97,6 +97,18 @@ export default function Sidebar() {
                             Reportes
                         </NavLink>
                     </li>
+                    <li>
+                            <NavLink
+                            to="/asiento"
+                            className={({ isActive }) =>
+                                isActive ? styles.active : styles.link
+                            }
+                        >
+                            Asiento
+                        </NavLink>
+
+
+                    </li>
                 </ul>
             </nav>
 

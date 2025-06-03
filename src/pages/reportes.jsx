@@ -17,7 +17,7 @@ export default function Reportes() {
 
     useEffect(() => {
         const datosEjemplo = [
-            { nombre: 'Reporte de Caja', fecha: '2024-08-01', tipo: 'PDF' },
+            { nombre: 'Reporte Flujo De Cuenta', fecha: '2024-08-01', tipo: 'PDF' },
             { nombre: 'Reporte de Proveedores', fecha: '2024-08-03', tipo: 'PDF' },
             { nombre: 'Movimientos Bancarios', fecha: '2024-08-05', tipo: 'PDF' },
             { nombre: 'Reporte de Cheques', fecha: '2024-08-07', tipo: 'PDF' },
@@ -27,7 +27,7 @@ export default function Reportes() {
     }, []);
 
     const abrirModal = (nombre) => {
-        if (nombre.includes('Caja') && !nombre.includes('Movimientos')) {
+        if (nombre.includes('Cuenta') && !nombre.includes('Movimientos')) {
             setModalAbierto('Caja');
         } else if (nombre.includes('Proveedores')) {
             setModalAbierto('proveedores');
