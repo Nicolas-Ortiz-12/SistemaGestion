@@ -4,7 +4,7 @@ import styles from './Asiento.module.css';
 export default function Asiento() {
     const [asientos, setAsientos] = useState([]);
     const [paginaActual, setPaginaActual] = useState(1);
-    const asientosPorPagina = 3;
+    const asientosPorPagina = 2;
 
     useEffect(() => {
         fetch('https://localhost:7149/api/AsientosContables')
@@ -41,7 +41,7 @@ export default function Asiento() {
                 let totalHaber = 0;
 
                 const detallesConSaldo = asiento.detalles.map(detalle => {
-                    saldo += detalle.debe - detalle.haber;
+                    saldo += detalle.haber - detalle.debe;
                     totalDebe += detalle.debe;
                     totalHaber += detalle.haber;
                     return { ...detalle, saldo: saldo };

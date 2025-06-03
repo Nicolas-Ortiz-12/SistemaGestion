@@ -58,9 +58,8 @@ export default function MovimientosBancarios() {
     const fetchMovimientos = async () => {
         setErrorMov(null)
         try {
-            // 1) Expirar cheques en backend
-            await fetch('https://localhost:7149/api/Movimiento/expirar-cheques', { method: 'PUT' })
-
+            
+           
             // 2) Cargar movimientos actualizados
             const resp = await fetch(`https://localhost:7149/api/Movimiento/cuenta/${state.account.idCuenta}`)
             if (!resp.ok) throw new Error('Error al cargar movimientos')

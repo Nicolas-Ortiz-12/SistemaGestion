@@ -32,6 +32,8 @@ export default function Sidebar() {
             setActiveIndex(2);
         } else if (pathname.includes('reportes')) {
             setActiveIndex(3);
+        }else if (pathname.includes('asiento')){
+            setActiveIndex(4);
         }
     }, [pathname]);
 
@@ -40,7 +42,7 @@ export default function Sidebar() {
         if (pathname.includes('ordenDePago')) return ordenDePagoImg;
         if (pathname.includes('listaDeBancos')) return listaDeBancosImg;
         if (pathname.includes('movimientoBancarios')) return movimentosImg;
-        if (pathname.includes('reportes')) return reportesImg; // NUEVO
+        if (pathname.includes('reportes')) return reportesImg; 
         return listaDeBancosImg;
     };
 

@@ -49,17 +49,23 @@ export default function OrdenDePago() {
             .catch(() => setCuentas([]));
     }, []);
 
-    // Cargar órdenes en pestaña Generadas
-    useEffect(() => {
-        if (activeTab !== 'generadas') return;
-        const desde = fechaGenDesde || '1900-01-01';
-        const hasta = fechaGenHasta || new Date().toISOString().slice(0, 10);
+   useEffect(() => {
+    if (activeTab !== 'generadas') return;
 
-        fetch(`https://localhost:7149/api/OrdenDePago/por-fechas?fechaInicio=${desde}&fechaFin=${hasta}`)
-            .then(res => res.json())
-            .then(setOrdenesGeneradas)
-            .catch(() => setOrdenesGeneradas([]));
-    }, [activeTab, fechaGenDesde, fechaGenHasta]);
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    // Si hay fechas definidas por el usuario, úsalas; si no, usa el rango del mes actual
+    const desde = fechaGenDesde || `${year}-${month}-01`;
+    const hasta = fechaGenHasta || `${year}-${month}-${day}`;
+
+    fetch(`https://localhost:7149/api/OrdenDePago/por-fechas?fechaInicio=${desde}&fechaFin=${hasta}`)
+        .then(res => res.json())
+        .then(setOrdenesGeneradas)
+        .catch(() => setOrdenesGeneradas([]));
+}, [activeTab, fechaGenDesde, fechaGenHasta]);
 
     // Manejo de búsqueda
     const handleBuscar = async e => {
