@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
 import Pagination from '../components/pagination';
 import styles from './ordenDePago.module.css';
+import TabSelector2 from '../components/tab2.jsx'
 
 export default function OrdenDePago() {
-    const [activeTab, setActiveTab] = useState('buscar');
+    const [activeTab, setActiveTab] = useState('buscar')
 
     // Búsqueda de facturas
     const [ruc, setRuc] = useState('');
@@ -106,10 +107,11 @@ export default function OrdenDePago() {
             <main className={styles.main}>
                 <Header title="Orden de Pago" />
                 <div className={styles.tabs}>
-                    <button onClick={() => setActiveTab('buscar')} className={`${styles.tabButton} ${activeTab === 'buscar' ? styles.active : ''}`}>Buscar / Generar</button>
-                    <button onClick={() => setActiveTab('generadas')} className={`${styles.tabButton} ${activeTab === 'generadas' ? styles.active : ''}`}>Órdenes Generadas</button>
+                    <TabSelector2
+                        activeTab={activeTab}
+                        onChange={tab => { setActiveTab(tab); setCurrentPage(1) }}
+                    />
                 </div>
-
                 {activeTab === 'buscar' ? (
                     <>
                         <form onSubmit={handleBuscar} className={styles.form}>
@@ -154,8 +156,8 @@ export default function OrdenDePago() {
                                     <td>{fac.proveedor.nombre}</td>
                                     <td>{formatoFecha(fac.fecha_exp)}</td>
                                     <td>{fac.nro_factura}</td>
-                                    <td>{fac.total}</td>
-                                    <td>{fac.saldo}</td>
+                                    <td>{fac.total.toLocaleString('es-PY')}</td>
+                                    <td>{fac.saldo.toLocaleString('es-PY')}</td>
                                     <td><input type="checkbox"
                                         checked={selectedIndices.includes(idx)}
                                         onChange={() => handleCheckboxChange(idx)} /></td>
@@ -168,19 +170,21 @@ export default function OrdenDePago() {
                 ) : (
                     <>
                         <h2 className={styles.texto}>Órdenes Generadas</h2>
-                        <div className={styles.inputDiv}>
-                            <label>Desde:</label>
-                            <input type="date"
-                                value={fechaGenDesde}
-                                onChange={e => setFechaGenDesde(e.target.value)}
-                                className={styles.input} />
-                        </div>
-                        <div className={styles.inputDiv}>
-                            <label>Hasta:</label>
-                            <input type="date"
-                                value={fechaGenHasta}
-                                onChange={e => setFechaGenHasta(e.target.value)}
-                                className={styles.input} />
+                        <div className={styles.formf}>
+                            <div className={styles.inputDiv}>
+                                <label>Desde:</label>
+                                <input type="date"
+                                    value={fechaGenDesde}
+                                    onChange={e => setFechaGenDesde(e.target.value)}
+                                    className={styles.input} />
+                            </div>
+                            <div className={styles.inputDiv}>
+                                <label>Hasta:</label>
+                                <input type="date"
+                                    value={fechaGenHasta}
+                                    onChange={e => setFechaGenHasta(e.target.value)}
+                                    className={styles.input} />
+                            </div>
                         </div>
                         {ordenesGeneradas.length === 0 ? <p>No hay órdenes en este rango.</p> : (
                             <table className={styles.table}>
@@ -201,7 +205,7 @@ export default function OrdenDePago() {
                                         <td>{ord.nroOrden}</td>
                                         <td>{ord.facturas[0]?.proveedor.nombre}</td>
                                         <td>{formatoFecha(m.fecha)}</td><td>{ord.facturas.length}</td>
-                                        <td>{m.monto}</td><td>{m.transaccion?.nombre || '—'}</td>
+                                        <td>{m.monto?.toLocaleString('es-PY')}</td><td>{m.transaccion?.nombre || '—'}</td>
                                         <td>{m.cuenta?.nroCuenta || m.ctaDestino}</td>
                                     </tr>);
                                 })}</tbody>

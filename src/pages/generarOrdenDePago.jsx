@@ -10,7 +10,13 @@ export default function GenerarOrdenDePago() {
     const proveedorInicial = location.state?.proveedor || '';
     const [cuentas, setCuentas] = useState([]);
 
-    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-PY')
+    const formatDate = isoDate => new Date(isoDate).toLocaleDateString('es-PY');
+    const formatMonto = monto => {
+        return Number(monto).toLocaleString('es-PY', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    };
     useEffect(() => {
         const fetchCuentas = async () => {
             try {
@@ -25,6 +31,7 @@ export default function GenerarOrdenDePago() {
 
         fetchCuentas();
     }, []);
+
     useEffect(() => {
         const fetchMovimientosPendientes = async () => {
             try {
@@ -62,6 +69,7 @@ export default function GenerarOrdenDePago() {
 
         fetchUltimoNumero();
     }, []);
+
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
     const [importeTotal, setImporteTotal] = useState(
         facturas.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
@@ -97,11 +105,11 @@ export default function GenerarOrdenDePago() {
             setModalFields({
                 IdMovi: null,
                 Fecha: new Date().toISOString().split('T')[0],
-                Monto: '',
+                Monto: importeTotal,
                 CtaDestino: '',
                 Beneficiario: proveedor,
-                Concepto: '',
-                Motivo: '',
+                Concepto: 'Pago a Proveedores',
+                Motivo: 'Pago de Facturas pendientes a Proveedores',
                 Estado: 'pendiente',
                 IdCuenta: cuentas[0]?.idCuenta?.toString() || '1',
                 IdTran: type === 'transferencia' ? '1' : '2'
@@ -180,30 +188,46 @@ export default function GenerarOrdenDePago() {
         }
     };
 
-    // Generar la orden completa (envía facturas + movimientos locales)
+    // Generar la orden completa (envía facturas + movimientos locales),
+    // y luego dispara la creación automática del asiento contable
     const generarOrden = async () => {
         if (movimientos.length === 0) {
             alert('Debes registrar al menos un movimiento de pago.');
             return;
         }
+
         const dto = {
             NroOrden: nroPago,
             IdMovi: movimientos[0]?.idMovi,
             FacturaIds: facturas.map(f => f.id_factura)
         };
         console.log('Enviando DTO:', dto);
+
         try {
+            // 1) Crear la orden de pago
             const res = await fetch('https://localhost:7149/api/OrdenDePago', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dto)
             });
-            if (!res.ok) throw new Error();
+            if (!res.ok) throw new Error('Error al crear la orden de pago');
             const orden = await res.json();
-            alert(`Orden ${orden.idOrden} generada`);
+
+            // 2) Generar automáticamente el asiento contable
+            const ordenId = orden.idOrden; // Asegúrate de que la API devuelva "idOrden"
+            const resAsiento = await fetch(
+                `https://localhost:7149/api/AsientosContables/generar-desde-orden/${ordenId}`,
+                { method: 'POST' }
+            );
+            if (!resAsiento.ok) throw new Error('Error al generar el asiento contable');
+            const asientoGenerado = await resAsiento.json();
+            console.log('Asiento contable generado:', asientoGenerado);
+
+            alert(`Orden ${orden.idOrden} generada.\nAsiento creado: ${asientoGenerado.nroAsiento}`);
             navigate(`/ordenDePago`);
-        } catch {
-            alert('No se pudo generar la orden.');
+        } catch (error) {
+            console.error(error);
+            alert('Ocurrió un error: ' + error.message);
         }
     };
 
@@ -232,7 +256,7 @@ export default function GenerarOrdenDePago() {
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Importe total</label>
-                        <input readOnly value={importeTotal} />
+                        <input readOnly value={formatMonto(importeTotal)} />
                     </div>
                 </form>
 
@@ -245,7 +269,6 @@ export default function GenerarOrdenDePago() {
                             <th>N°Factura</th>
                             <th>Total</th>
                             <th>Saldo</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -253,29 +276,31 @@ export default function GenerarOrdenDePago() {
                             <tr key={i}>
                                 <td>{formatDate(f.fecha_exp)}</td>
                                 <td>{f.nro_factura}</td>
-                                <td>{f.total}</td>
-                                <td>{f.saldo}</td>
-
+                                <td>{formatMonto(f.total)}</td>
+                                <td>{formatMonto(f.saldo)}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
                 <div className={styles.metodoContainer}>
                     <h2 className={styles.metodoTitle}>Método de Pago:</h2>
-                    <div className={styles.buttonGroup}>
-                        <button
-                            onClick={() => openModal('transferencia')}
-                            className={`${styles.btn} ${styles.btnTransferencia}`}
-                        >
-                            Transferencia
-                        </button>
-                        <button
-                            onClick={() => openModal('cheque')}
-                            className={`${styles.btn} ${styles.btnCheque}`}
-                        >
-                            Cheque
-                        </button>
-                    </div>
+                    {movimientos.filter(m => m.estado === 'pendiente').length === 0 && (
+                        <div className={styles.buttonGroup}>
+                            <button
+                                onClick={() => openModal('transferencia')}
+                                className={`${styles.btn} ${styles.btnTransferencia}`}
+                            >
+                                Transferencia
+                            </button>
+                            <button
+                                onClick={() => openModal('cheque')}
+                                className={`${styles.btn} ${styles.btnCheque}`}
+                            >
+                                Cheque
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Modal Crear/Editar */}
@@ -287,7 +312,7 @@ export default function GenerarOrdenDePago() {
                                 <button onClick={closeModal}>×</button>
                             </div>
                             <div className={styles.modalContent}>
-                                {['Fecha', 'Monto', 'Beneficiario', 'Concepto', 'Motivo'].map(name => (
+                                {['Fecha', 'Monto', 'Concepto', 'Motivo'].map(name => (
                                     <div key={name} className={styles.formRow}>
                                         <label>{name}:</label>
                                         <input
@@ -298,6 +323,21 @@ export default function GenerarOrdenDePago() {
                                         />
                                     </div>
                                 ))}
+
+                                <div className={styles.formRow}>
+                                    <label>{modalType === 'transferencia' ? 'Cta de Destino' : 'Beneficiario'}:</label>
+                                    <input
+                                        type="text"
+                                        name={modalType === 'transferencia' ? 'CtaDestino' : 'Beneficiario'}
+                                        value={
+                                            modalType === 'transferencia'
+                                                ? modalFields.CtaDestino
+                                                : modalFields.Beneficiario
+                                        }
+                                        onChange={handleFieldChange}
+                                    />
+                                </div>
+
                                 <div className={styles.formRow}>
                                     <label>Cuenta Origen:</label>
                                     <select
@@ -312,6 +352,7 @@ export default function GenerarOrdenDePago() {
                                         ))}
                                     </select>
                                 </div>
+
                                 <div className={styles.modalActions}>
                                     <button className={`${styles.btn} ${styles.btnGuardar}`} onClick={saveMovimiento}>Guardar</button>
                                     <button className={`${styles.btn} ${styles.btnCancelar}`} onClick={closeModal}>Cancelar</button>
@@ -339,7 +380,7 @@ export default function GenerarOrdenDePago() {
                             .map(m => (
                                 <tr key={m.idMovi}>
                                     <td>{formatDate(m.fecha)}</td>
-                                    <td>{m.monto}</td>
+                                    <td>{formatMonto(m.monto)}</td>
                                     <td>{cuentas.find(c => c.idCuenta === Number(m.idCuenta))?.nroCuenta || '(sin cuenta)'}</td>
                                     <td>{m.concepto}</td>
                                     <td>

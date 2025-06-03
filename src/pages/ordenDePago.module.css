@@ -20,6 +20,17 @@
     width: 90%;
 }
 
+.formf {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* <--- aumenta o reduce este valor según lo que necesites */
+    margin-top: 2rem;
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+    justify-content: flex-start; /* <--- evita que se vayan a extremos */
+    width: 90%;
+}
+
 .inputDiv{
     display: flex;
     flex-direction: column;

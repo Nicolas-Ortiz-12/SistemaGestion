@@ -40,9 +40,16 @@ const ChequeDetailModal = ({ isOpen, onClose, movimiento }) => {
                             <label>Concepto:</label>
                             <input className={styles.input} type="text" value={movimiento.concepto} readOnly />
                         </div>
+                    </div>
+                    <div className={styles.row}>
                         <div className={styles.field}>
                             <label>Motivo:</label>
-                            <input className={styles.input} type="text" value={movimiento.motivo || '—'} readOnly />
+                            <textarea
+                                className={styles.textarea}
+                                value={movimiento.motivo || '—'}
+                                readOnly
+                                rows={3}
+                            />
                         </div>
                     </div>
                     <div className={styles.row}>

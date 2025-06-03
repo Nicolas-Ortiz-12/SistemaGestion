@@ -35,6 +35,17 @@
     border-top-right-radius: 8px;
 }
 
+.textarea {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    background-color: white;
+    resize: vertical;
+    width: 96%;
+    min-height: 80px;
+}
+
 /* Contenedor del formulario */
 .form {
     padding: 30px;
