@@ -17,7 +17,6 @@ export default function Reportes() {
 
     useEffect(() => {
         const datosEjemplo = [
-            { nombre: 'Reporte Flujo De Cuenta', fecha: '2024-08-01', tipo: 'PDF' },
             { nombre: 'Reporte de Proveedores', fecha: '2024-08-03', tipo: 'PDF' },
             { nombre: 'Movimientos Bancarios', fecha: '2024-08-05', tipo: 'PDF' },
             { nombre: 'Reporte de Cheques', fecha: '2024-08-07', tipo: 'PDF' },
@@ -70,8 +69,6 @@ export default function Reportes() {
                         </tbody>
                     </table>
                 </div>
-
-                {modalAbierto === 'Caja' && <ModalReporteFlujoCaja onClose={() => setModalAbierto(null)} />}
                 {modalAbierto === 'proveedores' && <ModalReporteProveedores onClose={() => setModalAbierto(null)} />}
                 {modalAbierto === 'movimientos' && <ModalReporteMovimientos onClose={() => setModalAbierto(null)} />}
                 {modalAbierto === 'cheques' && <ModalReporteCheques onClose={() => setModalAbierto(null)} />}

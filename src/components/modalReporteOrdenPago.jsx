@@ -23,12 +23,12 @@ export default function ModalReporteOrdenPago({ onClose }) {
         const columns = ['Nro Orden', 'Fecha', 'Proveedor', 'Total', 'Método'];
         const data = ordenes.map(orden => {
             const fecha = orden.movimiento?.fecha || '-';
-            const metodo = orden.movimiento?.metodoPago || '-';
+            const metodo = orden.movimiento?.transaccion.nombre || '-';
             const nombreProveedor = orden.facturas[0]?.proveedor?.nombre || '-';
             const total = orden.facturas.reduce((sum, f) => sum + f.total, 0);
             return [orden.nroOrden, fecha, nombreProveedor, `Gs. ${total.toLocaleString()}`, metodo];
         });
-
+        console.log(data)
         autoTable(doc, {
             head: [columns],
             body: data,

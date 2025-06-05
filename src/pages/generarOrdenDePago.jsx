@@ -178,7 +178,7 @@ export default function GenerarOrdenDePago() {
         if (!window.confirm('¿Eliminar este movimiento?')) return;
         try {
             const res = await fetch(
-                `https://localhost:7149/api/Movimiento/${id}`,
+                `https://localhost:7149/api/Movimiento/Delete?idMovi=${id}`,
                 { method: 'DELETE' }
             );
             if (!res.ok) throw new Error();
@@ -234,7 +234,7 @@ export default function GenerarOrdenDePago() {
     return (
         <div className={styles.container}>
             <main className={styles.main}>
-                <Header title="Detalle Orden De Pago" />
+                <Header title="Nueva Orden De Pago" />
 
                 {/* Cabecera */}
                 <form className={styles.formHeader} onSubmit={e => e.preventDefault()}>
@@ -384,9 +384,6 @@ export default function GenerarOrdenDePago() {
                                     <td>{cuentas.find(c => c.idCuenta === Number(m.idCuenta))?.nroCuenta || '(sin cuenta)'}</td>
                                     <td>{m.concepto}</td>
                                     <td>
-                                        <button onClick={() => openModal(m.idTran === 1 ? 'transferencia' : 'cheque', m)}>
-                                            ✏️
-                                        </button>
                                         <button onClick={() => deleteMovimiento(m.idMovi)}>🗑️</button>
                                     </td>
                                 </tr>
@@ -406,7 +403,7 @@ export default function GenerarOrdenDePago() {
                         onClick={generarOrden}
                         className={styles.buttonGenerar}
                     >
-                        Generar Orden
+                        Guardar
                     </button>
                 </div>
             </main>
