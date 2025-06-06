@@ -29,7 +29,7 @@ export default function MovimientosBancarios() {
 
     const [activeTab, setActiveTab] = useState('movimientos')
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPageMov = 5
+    const itemsPerPageMov = 10
     const itemsPerPageCon = 10
 
     const [concFecha, setConcFecha] = useState(new Date().toISOString().slice(0, 10))
@@ -53,14 +53,10 @@ export default function MovimientosBancarios() {
         const formateado = formatearMonto(valor);
         setConcSaldo2do(formateado);
     };
-    
 
     const fetchMovimientos = async () => {
         setErrorMov(null)
         try {
-            
-           
-            // 2) Cargar movimientos actualizados
             const resp = await fetch(`https://localhost:7149/api/Movimiento/cuenta/${state.account.idCuenta}`)
             if (!resp.ok) throw new Error('Error al cargar movimientos')
             const data = await resp.json()
@@ -94,11 +90,8 @@ export default function MovimientosBancarios() {
         }
     }
 
-    // Al cambiar pestaña a "movimientos", expirar y cargar movimientos
     useEffect(() => {
-        if (activeTab === 'movimientos') {
-            fetchMovimientos()
-        }
+        if (activeTab === 'movimientos') fetchMovimientos()
     }, [activeTab, state.account.id])
 
     useEffect(() => { fetchCuenta() }, [state.account.idCuenta])
@@ -123,7 +116,6 @@ export default function MovimientosBancarios() {
         if (isNaN(saldo2)) return alert('Ingrese un valor numérico en Saldo 2do Edo. Cta.')
         if (saldo2 !== concSaldoAct) return alert('Saldo 2do debe igualar Saldo Actual')
 
-
         const payload = {
             cuentaId: state.account.idCuenta,
             fechaConciliacion: concFecha,
@@ -132,7 +124,9 @@ export default function MovimientosBancarios() {
 
         try {
             const resp = await fetch('https://localhost:7149/api/Movimiento/conciliar', {
-                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             })
             if (!resp.ok) {
                 const text = await resp.text()
@@ -142,41 +136,45 @@ export default function MovimientosBancarios() {
             setSelectedConcMovs([])
             setConcSaldo2do('')
             setConcSaldoAct(0)
-            fetchConciliaciones()
-            fetchCuenta()
-            fetchMovimientos()
+            await Promise.all([
+                fetchConciliaciones(),
+                fetchCuenta(),
+                fetchMovimientos()
+            ])
         } catch (err) {
             alert(`Error: ${err.message}`)
         }
     }
 
-    const handleSaveMovimiento = savedMov => {
+    const handleSaveMovimiento = async savedMov => {
         const monto = savedMov.monto
         const isDebit = savedMov.transaccion.tipoMov === 'D'
         const isCheque = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque'
-
-        const isChequeDeposito = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque deposito';
-        const estadoEmitido = savedMov.estado.toLowerCase() === 'emitido';
+        const isChequeDeposito = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque deposito'
+        const estadoEmitido = savedMov.estado.toLowerCase() === 'emitido'
 
         setCuenta(prev => {
-            // No afectar el saldo si es Cheque Depósito Emitido
             if (isChequeDeposito && estadoEmitido) return prev;
-
             return {
                 ...prev,
                 saldo: isDebit
                     ? (isCheque ? prev.saldo : prev.saldo - monto)
                     : prev.saldo + monto
             };
-        });
-
+        })
 
         if (isCheque) savedMov.estado = 'Emitido'
         setMovimientos(prev => [savedMov, ...prev])
         setCurrentPage(1)
+
+        // 🟢 NUEVO: actualizamos datos del backend para reflejar estados correctos
+        await Promise.all([
+            fetchCuenta(),
+            fetchMovimientos(),
+            fetchConciliaciones()
+        ])
     }
 
-    // Paginación
     const startMov = (currentPage - 1) * itemsPerPageMov
     const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
     const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
@@ -243,15 +241,14 @@ export default function MovimientosBancarios() {
                                                 <td style={{ color: m.estado === 'Expirado' ? 'red' : 'inherit' }}>
                                                     {m.estado}
                                                 </td>
-                                                <td><button
-                                                        className={styles.actionBtn}
-                                                        onClick={() => {
-                                                            setDetalleMov(m)
-                                                            setDetalleOpen(true)
-                                                        }}
-                                                    >
+                                                <td>
+                                                    <button className={styles.actionBtn} onClick={() => {
+                                                        setDetalleMov(m)
+                                                        setDetalleOpen(true)
+                                                    }}>
                                                         📋
-                                                    </button></td>
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

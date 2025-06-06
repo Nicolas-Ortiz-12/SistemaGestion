@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import styles from './modalReportes.module.css';
+import styles from './modalreportes.module.css';
 
 export default function ModalReporteMovimientos({ onClose }) {
   const [fechaInicio, setFechaInicio] = useState('');
@@ -9,7 +9,6 @@ export default function ModalReporteMovimientos({ onClose }) {
   const [cuenta, setCuenta] = useState('');
   const [cuentasDisponibles, setCuentasDisponibles] = useState([]);
 
-  // Obtener todas las cuentas al cargar el componente
   useEffect(() => {
     const obtenerCuentas = async () => {
       try {
@@ -21,7 +20,6 @@ export default function ModalReporteMovimientos({ onClose }) {
         console.error('Error al cargar cuentas:', error);
       }
     };
-
     obtenerCuentas();
   }, []);
 
@@ -33,14 +31,16 @@ export default function ModalReporteMovimientos({ onClose }) {
       if (!resp.ok) throw new Error('Error al obtener movimientos');
       const data = await resp.json();
 
-      const filtrados = data.filter(m => {
-        const fechaValida =
-          (!fechaInicio || m.fecha >= fechaInicio) &&
-          (!fechaFin || m.fecha <= fechaFin);
-        const cuentaValida =
-          !cuenta || m.idCuenta === parseInt(cuenta);
-        return fechaValida && cuentaValida;
-      });
+      const filtrados = data
+        .filter(m => {
+          const fechaValida =
+            (!fechaInicio || m.fecha >= fechaInicio) &&
+            (!fechaFin || m.fecha <= fechaFin);
+          const cuentaValida =
+            !cuenta || m.idCuenta === parseInt(cuenta);
+          return fechaValida && cuentaValida;
+        })
+        .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
       generarPDF(filtrados);
       onClose();
@@ -49,36 +49,60 @@ export default function ModalReporteMovimientos({ onClose }) {
     }
   };
 
-  const generarPDF = (datos) => {
+  const generarPDF = (movimientos) => {
     const doc = new jsPDF();
-
     const cuentaInfo = cuentasDisponibles.find(c => c.idCuenta === parseInt(cuenta));
 
     doc.setFontSize(16);
-    doc.text('REPORTE DE MOVIMIENTOS', 70, 15);
+    doc.text('REPORTE DE MOVIMIENTOS BANCARIOS', 50, 15);
 
     doc.setFontSize(12);
-    doc.text(`Cuenta: ${cuentaInfo?.nroCuenta || '---'}`, 14, 30);
-    doc.text(`Titular: ${cuentaInfo?.nombre || '---'}`, 14, 37);
-    doc.text(`Tipo de Cuenta: ${cuentaInfo?.tCuenta || '---'}`, 14, 44);
+    doc.text(`Titular: ${cuentaInfo?.nombre || '---'}`, 14, 30);
+    doc.text(`Cuenta: ${cuentaInfo?.nroCuenta || '---'}`, 14, 37);
+    doc.text(`Tipo de cuenta: ${cuentaInfo?.tCuenta || '---'}`, 14, 44);
     doc.text(`Rango de fechas: ${fechaInicio || '---'} a ${fechaFin || '---'}`, 14, 51);
     doc.text(`Moneda: Guaraníes (Gs)`, 14, 58);
 
-    const datosTabla = datos.map(m => [
-      m.fecha,
-      m.concepto,
-      `${m.monto.toLocaleString()} Gs`,
-      m.cuenta?.nroCuenta || '---'
-    ]);
+    let saldo = 0;
+    const datosTabla = movimientos.map(m => {
+      const tipoTexto = m.transaccion.tipoMov === 'D' ? 'Débito' : 'Crédito';
+      saldo += (m.transaccion.tipoMov === 'D' ? -m.monto : m.monto);
+
+      return [
+        m.fecha,
+        m.concepto,
+        tipoTexto,
+        `${m.monto.toLocaleString()} Gs`,
+        `${saldo.toLocaleString()} Gs`
+      ];
+    });
 
     autoTable(doc, {
       startY: 70,
-      head: [['Fecha', 'Descripción', 'Monto', 'Cuenta']],
-      body: datosTabla
+      head: [['Fecha', 'Descripción', 'Tipo de Movimiento', 'Monto', 'Saldo Disponible']],
+      body: datosTabla,
+      styles: {
+        fontSize: 10,
+        halign: 'center'
+      },
+      headStyles: {
+        fillColor: [40, 40, 40],
+        textColor: [255, 255, 255]
+      },
+      columnStyles: {
+        1: { halign: 'left' },
+        3: { halign: 'right' },
+        4: { halign: 'right' }
+      }
     });
 
-    const total = datos.reduce((sum, m) => sum + m.monto, 0);
-    doc.text(`Total: ${total.toLocaleString()} Gs`, 14, doc.lastAutoTable.finalY + 10);
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(`Emitido el: ${new Date().toLocaleDateString()}`, 14, 290);
+      doc.text(`Página ${i} de ${totalPages}`, 160, 290);
+    }
 
     doc.output('dataurlnewwindow');
   };
@@ -87,7 +111,7 @@ export default function ModalReporteMovimientos({ onClose }) {
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <h2 className={styles.modalTitle}>Generar Reporte de Movimientos</h2>
-        <form className={styles.conciliacionForm} onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={styles.conciliacionForm}>
           <div>
             <label>Fecha de inicio:</label>
             <input
@@ -97,7 +121,6 @@ export default function ModalReporteMovimientos({ onClose }) {
               required
             />
           </div>
-
           <div>
             <label>Fecha de fin:</label>
             <input
@@ -107,7 +130,6 @@ export default function ModalReporteMovimientos({ onClose }) {
               required
             />
           </div>
-
           <div>
             <label>Filtrar por cuenta (opcional):</label>
             <select
@@ -122,12 +144,11 @@ export default function ModalReporteMovimientos({ onClose }) {
               ))}
             </select>
           </div>
-          
-
           <button type="submit">Descargar Reporte</button>
         </form>
-
-        <button className={styles.closeButton} onClick={onClose}>Cerrar</button>
+        <button onClick={onClose} className={styles.closeButton}>
+          Cerrar
+        </button>
       </div>
     </div>
   );
