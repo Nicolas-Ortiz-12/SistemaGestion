@@ -147,41 +147,33 @@ export default function MovimientosBancarios() {
     }
 
     const handleSaveMovimiento = async savedMov => {
-        const monto = savedMov.monto
-        const isDebit = savedMov.transaccion.tipoMov === 'D'
-        const isCheque = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque'
-        const isChequeDeposito = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque deposito'
-        const estadoEmitido = savedMov.estado.toLowerCase() === 'emitido'
+        const isCheque = savedMov.transaccion.nombre.trim().toLowerCase() === 'cheque';
 
-        setCuenta(prev => {
-            if (isChequeDeposito && estadoEmitido) return prev;
-            return {
-                ...prev,
-                saldo: isDebit
-                    ? (isCheque ? prev.saldo : prev.saldo - monto)
-                    : prev.saldo + monto
-            };
-        })
+        if (isCheque) savedMov.estado = 'Emitido';
 
-        if (isCheque) savedMov.estado = 'Emitido'
-        setMovimientos(prev => [savedMov, ...prev])
-        setCurrentPage(1)
+        setMovimientos(prev => [savedMov, ...prev]);
+        setCurrentPage(1);
 
-        // 🟢 NUEVO: actualizamos datos del backend para reflejar estados correctos
+        // ACTUALIZA todo directo desde el backend: saldo, movimientos, conciliaciones
         await Promise.all([
             fetchCuenta(),
             fetchMovimientos(),
             fetchConciliaciones()
-        ])
-    }
+        ]);
+    };
 
     const startMov = (currentPage - 1) * itemsPerPageMov
     const pageMov = movimientos.slice(startMov, startMov + itemsPerPageMov)
     const totalPagesMov = Math.ceil(movimientos.length / itemsPerPageMov)
 
+    const conciliacionesFiltradas = conciliaciones.filter(c =>
+        c.transaccion.nombre.toLowerCase() === 'cheque' &&
+        c.estado.toLowerCase() === 'emitido'
+    )
+
     const startCon = (currentPage - 1) * itemsPerPageCon
-    const pageCon = conciliaciones.slice(startCon, startCon + itemsPerPageCon)
-    const totalPagesCon = Math.ceil(conciliaciones.length / itemsPerPageCon)
+    const pageCon = conciliacionesFiltradas.slice(startCon, startCon + itemsPerPageCon)
+    const totalPagesCon = Math.ceil(conciliacionesFiltradas.length / itemsPerPageCon)
 
     return (
         <div className={styles.container}>

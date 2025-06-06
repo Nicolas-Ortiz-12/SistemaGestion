@@ -69,11 +69,12 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
         const formateado = formatearMonto(valor);
         setMonto(formateado);
     };
-    
+
 
     const handleSave = async () => {
         const seleccion = tiposTransaccion.find(t => String(t.idTran) === tipoTransaccion);
         const nombreTipo = seleccion?.nombre;
+        const tipoMov = seleccion?.tipoMov; // Asegúrate de que 'tipoMov' esté disponible en el objeto
         let estado = nombreTipo === 'Cheque' ? 'Emitido' : 'Activo';
 
         if (nombreTipo === 'Cheque Deposito') {
@@ -81,7 +82,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
                 const cuentaOrigenResp = await fetch(`https://localhost:7149/api/Cuenta/${accountId}`);
                 if (!cuentaOrigenResp.ok) throw new Error('Error al obtener cuenta');
                 const cuentaOrigen = await cuentaOrigenResp.json();
-                
+
                 const mismoBanco = cuentaOrigen.banco.nombre === bancoEmisor;
                 estado = mismoBanco ? 'Activo' : 'Emitido';
             } catch (err) {
@@ -90,9 +91,25 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
             }
         }
 
+        const montoNumerico = parseFloat(monto.replace(/\./g, ''));
 
+        // 🛑 VALIDACIÓN DE SALDO INSUFICIENTE
+        if (tipoMov === 'D') {
+            try {
+                const cuentaResp = await fetch(`https://localhost:7149/api/Cuenta/${accountId}`);
+                if (!cuentaResp.ok) throw new Error('Error al obtener cuenta');
+                const cuenta = await cuentaResp.json();
 
-        const montoNumerico = monto.replace(/\./g, '');
+                if (montoNumerico > cuenta.saldo) {
+                    alert('Saldo insuficiente para realizar esta operación.');
+                    return;
+                }
+            } catch (err) {
+                console.error('Error al verificar saldo:', err);
+                alert('No se pudo verificar el saldo. Intente nuevamente.');
+                return;
+            }
+        }
 
         const formData = new FormData();
         formData.append('Monto', montoNumerico);
@@ -118,6 +135,7 @@ export default function AgregarTransaccion({ isOpen, onClose, accountId, onSave 
             console.error('Error al guardar Movimiento:', error);
         }
     };
+
 
     if (!isOpen) return null;
 
